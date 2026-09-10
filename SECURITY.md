@@ -11,6 +11,8 @@ platform-administrator rights. A user can list and revoke only their own named M
 
 ## Credential handling
 
+- Create and revoke personal MCP tokens only from the signed-in ELEMS account interface. Never
+  extract or reuse the browser's ELEMS sign-in credential for client setup.
 - Store MCP tokens in a password manager and inject them through `ELEMS_MCP_TOKEN`.
 - Never commit tokens or paste them into issue reports, logs, screenshots, or chat messages.
 - Revoke a token immediately if it may have been exposed.

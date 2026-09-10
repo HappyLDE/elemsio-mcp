@@ -26,38 +26,26 @@ product, or content identifier directly.
 Treat the token like a password. Do not paste it into source code, `config.toml`, chat messages, issue
 reports, logs, or commits.
 
-## Create a named MCP token
+## Create a personal MCP token
 
 Named MCP tokens are user-owned, revocable opaque access tokens. ELEMS stores only a hash. The
 plaintext value is shown once when the token is created. Tokens currently expire after the lifetime
 configured by ELEMS (one year by default).
 
-This first release exposes token management through the API. Start with the short-lived bearer token
-returned by a supported normal ELEMS sign-in client and keep it in `ELEMS_SESSION_TOKEN` only long
-enough to create the dedicated token:
+Use the normal ELEMS account interface:
 
-```sh
-curl --request POST https://api.elems.io/account/mcp-tokens \
-  --header "Authorization: Bearer $ELEMS_SESSION_TOKEN" \
-  --header "Content-Type: application/json" \
-  --data '{"name":"Codex laptop"}'
-```
+1. Create or sign in to your ELEMS account at [app.elems.io](https://app.elems.io).
+2. Open **Account**.
+3. Find **Developer & API → MCP / API tokens**.
+4. Enter a descriptive name such as `Omarchy Codex` and choose **Create token**.
+5. Copy the token from the one-time display and store it securely.
 
-The response's `token.value` is the MCP token. Save it immediately in your password manager; it
-cannot be displayed again.
+The token cannot be displayed again after you close the one-time view. The same account page lists
+token names, creation dates, and expiry dates without exposing plaintext, and lets you revoke a token
+at any time.
 
-List or revoke only your own named tokens:
-
-```sh
-curl https://api.elems.io/account/mcp-tokens \
-  --header "Authorization: Bearer $ELEMS_SESSION_TOKEN"
-
-curl --request DELETE https://api.elems.io/account/mcp-tokens/TOKEN_ID \
-  --header "Authorization: Bearer $ELEMS_SESSION_TOKEN"
-```
-
-Replace `TOKEN_ID` with an ID returned by the list endpoint. Never put the plaintext MCP token in a
-URL.
+You never need to open browser developer tools, extract an ELEMS sign-in credential, inspect network
+requests, use an administrator account, or access an ELEMS repository or database.
 
 ## Configure Codex
 
