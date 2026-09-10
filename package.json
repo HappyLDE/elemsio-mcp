@@ -1,0 +1,10 @@
+{
+  "name": "elemsio-mcp-public-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "resources:size": "node scripts/resource-sizes.mjs",
+    "sync:api": "node scripts/sync-api-resources.mjs"
+  }
+}
