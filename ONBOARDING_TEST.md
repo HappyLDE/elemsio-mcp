@@ -5,15 +5,21 @@ repository, no administrator rights, this public documentation, and a user-owned
 
 ## Configuration path
 
-1. Store the token in `ELEMS_MCP_TOKEN` without writing it to a repository.
-2. Add the Streamable HTTP server from the README to Codex `config.toml`.
-3. Restart Codex and confirm the ELEMS server appears in `/mcp` or `codex mcp list`.
-4. Ask the agent to list the account's websites.
-5. Select one returned website, or explicitly create a new website.
-6. Confirm the new website is immediately returned by exact-ID lookup and context inspection.
-7. List pages, inspect one page, and perform a non-publishing draft operation where appropriate.
-8. Read back the draft and open its supported preview.
-9. Publish only in an authorized test website and only when explicitly requested.
+1. Create or sign in to a normal ELEMS account.
+2. Open **Account → Developer & API → MCP / API tokens**.
+3. Create a descriptively named personal token and copy it from the one-time display.
+4. Confirm the account page subsequently lists only token metadata and can revoke the token with
+   confirmation. Browser developer tools, session-token extraction, administrator access, source
+   repositories, and database access must not be required.
+5. Store the personal token in `ELEMS_MCP_TOKEN` without writing it to a repository.
+6. Add the Streamable HTTP server from the README to Codex `config.toml`.
+7. Restart Codex and confirm the ELEMS server appears in `/mcp` or `codex mcp list`.
+8. Ask the agent to list the account's websites.
+9. Select one returned website, or explicitly create a new website.
+10. Confirm the new website is immediately returned by exact-ID lookup and context inspection.
+11. List pages, inspect one page, and perform a non-publishing draft operation where appropriate.
+12. Read back the draft and open its supported preview.
+13. Publish only in an authorized test website and only when explicitly requested.
 
 ## Required isolation assertions
 
