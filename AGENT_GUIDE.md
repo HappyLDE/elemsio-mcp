@@ -1,63 +1,43 @@
 # ELEMS MCP Agent Guide
 
-The MCP server's tool descriptions, schemas, instructions, and `elems://docs/agent-guide` resource are
-authoritative. Read them after connecting.
+This guide is intentionally small. Tool descriptions and schemas are the operation-level contract.
+When an ELEMS-specific concept is unclear, read `elems://docs/index`, then load only the focused
+resource it recommends. Do not load the complete authoring corpus by default.
 
-## Scope and selection
+## Universal rules
 
-- Start with `elems_list_websites` or `elems_find_website` and select the intended website before any
-  scoped operation.
-- If the user explicitly asks for a new website, use `elems_create_website`; never try to select an
-  owner, entity, privilege, subscription, or unrelated custom domain.
-- Keep the selected `website_id` as the working scope until the user changes it.
-- Never infer access from an identifier. Respect server-side ownership and mutability results.
-- If discovery is ambiguous, present the candidates and do not guess.
+- Start with `elems_list_websites` or `elems_find_website`. Keep the selected `website_id` as scope
+  until the user changes it. Never infer authorization from an identifier.
+- Prefer the smallest useful read: `elems_get_context`, then search, then one scoped subtree. Fetch a
+  whole page tree only for ambiguity or genuinely page-wide work.
+- Inspection is not mutation authority. `suggested_inspection_root` and the deprecated
+  `suggested_edit_root` are context boundaries only. Mutate only a fresh, mutation-ready target whose
+  ownership and mutability metadata allow the requested operation.
+- Prefer narrow text, attribute, class, behavior, embed, insert, or delete operations. Preserve
+  unrelated siblings, fields, locale values, and behavior.
+- Replacing a target that has children removes every existing child subtree. Set destructive intent
+  only when that removal is explicitly required by the requested outcome.
+- Read immediately before compare-and-set writes and verify afterward. Keep page/template edits as
+  drafts, preview meaningful changes, and perform browser QA after visual or interactive changes.
+- Publication is a separate deliberate tool call. Never publish as a side effect of another edit.
+- Use ELEMS Media for public hosted assets. Published pages must not refer to local filesystem paths
+  or temporary chat URLs.
+- Use generic ELEMS capabilities. Do not invent function types, commands, raw HTML workarounds, or
+  website-specific platform behavior.
 
-## Inspect narrowly, then mutate narrowly
-
-For a localized page edit, prefer:
+## Default edit flow
 
 ```text
-search → subtree → mutate → read back
+resolve website -> get context -> resolve page -> search -> inspect subtree
+-> choose the narrowest authorized target -> mutate -> read back -> preview/QA
+-> publish only when explicitly requested
 ```
 
-- Search for distinctive visible text with `elems_search_page_elements`.
-- Inspect only the matched target or `suggested_inspection_root` with
-  `elems_get_element_subtree`.
-- `suggested_inspection_root` is context for inspection, not mutation authority. The deprecated
-  `suggested_edit_root` has the same inspection-only meaning.
-- Choose the narrowest page-owned mutation target containing only the requested content.
-- Prefer text, attribute, class, embed, insert, or delete operations over broad structural
-  replacement.
-- Use full-page element inspection only when search is ambiguous, scoped context is insufficient, or
-  the task genuinely spans the full page.
+For structural Markup V1 work, also read `elems://docs/markup-v1`, validate the exact payload, and
+pass the validated string unchanged to the mutation tool.
 
-Destructive structural replacement requires explicit user intent. If the server reports that
-replacement would remove existing child subtrees, do not set the destructive-intent flag unless the
-user's requested outcome clearly requires removing all of them.
+## Stop condition
 
-## Drafts, previews, and publication
-
-- Treat page and template changes as drafts unless the tool explicitly says otherwise.
-- Read current state immediately before a compare-and-set write and verify it afterward.
-- Use the supported draft preview tool and browser rendering for visual QA when needed.
-- Publication is a separate deliberate operation. Never publish implicitly after another mutation.
-- Read the latest publication state and revision before publishing.
-
-## Media and platform behavior
-
-- Use ELEMS Media discovery or the supported prepare-upload/direct-upload/finalize flow for public
-  website media.
-- Do not use local filesystem paths, temporary chat URLs, unrelated external URLs, or protected
-  assets as public website media.
-- Avoid website-specific platform hacks. If a reusable capability is missing, report the missing MCP
-  capability.
-- Do not fall back to an authenticated editor/admin UI unless the user explicitly requests UI use.
-
-## Structural work
-
-- Read `elems://docs/markup-v1` before structural imports.
-- Validate markup with the read-only validator, then pass the validated markup unchanged to the
-  import tool.
-- Use only mutation-ready identifiers and hashes returned by the latest inspection.
-- Preserve unrelated siblings and locale content.
+If the requested result cannot be expressed by the exposed ELEMS MCP tools and documented
+capabilities, stop and report the missing platform capability. Do not bypass ownership, use an
+authenticated editor as a fallback, fabricate an MCP operation, or modify private platform code.

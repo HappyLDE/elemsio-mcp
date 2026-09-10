@@ -13,7 +13,7 @@ It can create an ELEMS website, discover and manage websites your account can ac
 pages, work with page elements and ELEMS Media, manage supported templates and structured content,
 preview drafts, and publish through explicit supported tools.
 
-Named token management, website inventory, and normal-user website creation require ELEMS MCP 1.36.0
+Named token management, website inventory, normal-user website creation, and modular authoring resources require ELEMS MCP 1.37.0
 or later. After connecting, check the server version and exposed tool list before beginning.
 
 ## Security model
@@ -109,14 +109,15 @@ elems_list_websites or elems_find_website
 → publish only when explicitly requested
 ```
 
-For detailed agent behavior, read [AGENT_GUIDE.md](AGENT_GUIDE.md).
+For universal agent behavior, read [AGENT_GUIDE.md](AGENT_GUIDE.md). For authoring topics, start with
+the small [documentation index](docs/index.md) and open only the relevant focused documents.
 
 ## The server is authoritative
 
 After connecting, agents should inspect the MCP tool schemas, descriptions, server instructions, and
-the `elems://docs/agent-guide` resource. Those are the current machine-readable contract. This public
-repository intentionally does not duplicate ELEMS implementation details or the complete tool
-reference.
+the small `elems://docs/agent-guide` resource. If more authoring context is needed, read
+`elems://docs/index` and then only the named topic resources. This repository documents the public
+authoring contract without exposing private implementation details or duplicating every tool field.
 
 ## Troubleshooting
 
