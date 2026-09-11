@@ -37,6 +37,12 @@ through the template insertion contract and the shared allowlist; validate first
 `elems_validate_template_element`. Page insertion is static-only outside the exact auth/account
 profile supported by section validation/import.
 
+Template-owned images follow the same isolation rule: inspect the effective template, then mutate an
+eligible `attribute:src`/localized `attribute:alt` target or insert canonical Markup V1 in template
+scope. Image sources must be exact canonical URLs from the same website's ELEMS Media. A page-scoped
+request cannot mutate a template-owned image, and a template ID from another website or page context
+does not grant authority.
+
 Menu-provided labels and items are runtime behavior, not ordinary text while their own command is
 present. For an intentionally static label, update its exact `behavior_targets[]` entry to remove the
 binding, inspect again, then update the newly exposed text target. Static text inside a valid menu
