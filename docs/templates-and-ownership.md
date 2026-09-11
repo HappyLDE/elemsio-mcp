@@ -37,6 +37,13 @@ through the template insertion contract and the shared allowlist; validate first
 `elems_validate_template_element`. Page insertion is static-only outside the exact auth/account
 profile supported by section validation/import.
 
+Menu-provided labels and items are runtime behavior, not ordinary text while their own command is
+present. For an intentionally static label, update its exact `behavior_targets[]` entry to remove the
+binding, inspect again, then update the newly exposed text target. Static text inside a valid menu
+provider becomes editable only after its own runtime command is absent; loop/name/URL-bound menu
+items remain protected. Inspection normalizes the established legacy `loop` spelling to canonical
+`loop:` so existing menu behavior can be migrated through the same CAS-protected behavior tool.
+
 Template publication uses the fresh template draft revision and is separate from page publication.
 A page preview composes the isolated template draft with the page so shared changes can be verified
 before cutover.
