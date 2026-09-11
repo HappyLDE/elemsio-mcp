@@ -31,15 +31,26 @@ that actually accepts it, such as a guarded passive HTML Embed; it is not conver
 
 ## Use in elements
 
-Use canonical media references returned for the selected website. For an image, use semantic `img` or
+Use the exact canonical `url`, `url_200`, or `url_600` returned for the selected website as the
+mutation-ready image `src`; agents do not construct CDN or storage paths. The server checks that the
+URL resolves to a created image in that same website's Media Library. For an image, use semantic `img` or
 `picture` structure, provide meaningful localized `alt` text when the image conveys information, and
 include dimensions/loading behavior where appropriate. Decorative images should have intentionally
 empty alt text only when that state is supported by the selected mutation path.
 
-Markup V1 append cannot introduce arbitrary image URLs; replacement may only reuse URLs already in
-the target section. In practice, import a safe structure, then use the supported inspected
-image-reference mutation surface when one is exposed. If no tool can bind the new canonical media
-reference to the desired element, report the missing MCP capability rather than injecting HTML.
+For an existing eligible `img`, inspect its `attribute:src` and localized `attribute:alt` targets and
+use `elems_update_element` with their exact current values/hashes. For a new image, include the
+same-website Media URL in canonical Markup V1 and use normal section import or narrow page/template
+insertion with the relevant structural CAS. Arbitrary external, missing, non-image, cross-website,
+non-HTTPS, executable, and upload-session URLs remain rejected.
+
+Canonical workflow:
+
+```text
+elems_list_media or finalize upload -> retain exact canonical image URL
+-> inspect image target or structural parent -> mutate src/alt or validate and insert img
+-> inspect again -> regenerate/preview draft -> browser QA
+```
 
 Protected `ResourceAsset` uploads are a different, access-controlled content-delivery contract. Do
 not use protected assets as public page media or expose their signed part URLs.

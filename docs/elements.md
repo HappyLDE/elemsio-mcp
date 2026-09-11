@@ -33,7 +33,7 @@ mutation-ready identifier and fresh hash emitted by the matching inspection surf
 
 | Change | Inspection field |
 | --- | --- |
-| Localized text/attribute or `href` | `elements[].update_target_id` and current value/hash |
+| Localized text/attribute, `href`, or image `src` | `elements[].update_target_id` and current value/hash |
 | Classes | `class_targets[].mdid` and `classes_hash` |
 | Behavior | `behavior_targets[].target_id` and `behavior_hash` |
 | Existing owned JavaScript | `script_targets[].target_id` and `script_hash` |
@@ -49,6 +49,20 @@ Some older builder-authored links may expose a current `href` beginning with the
 returned value and hash back unchanged as the expected state, then replace it with a normal safe
 relative, `http`, or `https` destination. Arbitrary Liquid, protocol-relative origins, executable
 schemes, event attributes, and non-allowlisted attributes remain unavailable.
+
+## Image targets
+
+An eligible page- or template-owned `img` exposes separate mutation-ready `attribute:src` and
+localized `attribute:alt` targets. Change `src` with `elems_update_element`, passing the exact current
+value/hash and an exact canonical image URL returned by same-website ELEMS Media. The server resolves
+that URL against the website's Media Library; arbitrary external, missing, non-image, cross-website,
+non-HTTPS, `data:`, `javascript:`, and `vbscript:` references fail closed.
+
+To insert an image, use normal Markup V1 such as `img` with localized `alt`, optional dimensions and
+loading/decoding attributes, and the exact same-website Media URL as `src`. Validate section imports
+before import; narrow page/template insertion uses the fresh parent `children_hash`. Responsive
+`srcset`/`sizes` are not currently in the public attribute allowlist. Inline handlers such as
+`onerror`, raw HTML, and inline style remain forbidden.
 
 ## Inspection versus authority
 
