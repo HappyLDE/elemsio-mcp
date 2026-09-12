@@ -16,8 +16,9 @@ children, and a stable `mdid`. Common author-facing fields are:
 - `functionType`, `functionData`, and `commands`: allowlisted runtime behavior. Load the function and
   command resources only when dynamic behavior matters.
 
-Do not send raw element-tree JSON or HTML. Structural creation uses canonical Markup V1. Normal
-visible text belongs in localized element content, not in `name` and not as injected HTML.
+Do not send raw element-tree JSON or HTML. Structural creation uses canonical Markup V1: the element
+token on each markup line is its creation `domType`. Normal visible text belongs in localized element
+content, not in `name` and not as injected HTML.
 
 Common safe structural `domType` values are `section`, `div`, `article`, `aside`, `nav`, `h1`-`h6`,
 `p`, `span`, `a`, `button`, `ul`, `ol`, `li`, `img`, `picture`, `source`, `figure`, `figcaption`,
@@ -25,6 +26,14 @@ Common safe structural `domType` values are `section`, `div`, `article`, `aside`
 `option`. The auth/account profile also permits `form`. Markup V1 remains authoritative for the
 current element and attribute allowlists. Raw page-shell `header`/`footer` elements are not import
 targets; shared shell content belongs to the effective template.
+
+An existing eligible ordinary element can change between the same safe structural types (except the
+protected `section` ownership type) with `elems_update_element_dom_type`. Inspect
+`dom_type_targets[]`, pass its exact `target_id` and `dom_type_hash`, and select the destination from
+the tool's closed enum. Invalid structures (for example, children under a destination `img`),
+dynamic/script/embed-owned targets, shared/prefab structures, roots, and shell/declaration types are
+rejected. Declaration/head types such as `link` remain outside ordinary Markup V1 and DOM-type
+mutation. The separate template head-declaration capability supports only its closed safe profiles.
 
 ## Identity is operation-specific
 
@@ -35,6 +44,8 @@ mutation-ready identifier and fresh hash emitted by the matching inspection surf
 | --- | --- |
 | Localized text/attribute, `href`, or image `src` | `elements[].update_target_id` and current value/hash |
 | Classes | `class_targets[].mdid` and `classes_hash` |
+| DOM type | `dom_type_targets[].target_id` and `dom_type_hash` |
+| Head stylesheet declaration | `head_declarations.head.children_hash`, then the declaration `target_id` and `declaration_hash` for removal |
 | Behavior | `behavior_targets[].target_id` and `behavior_hash` |
 | Existing owned JavaScript | `script_targets[].target_id` and `script_hash` |
 | HTML Embed | `html_embeds[].mdid` and `embed_hash` |
