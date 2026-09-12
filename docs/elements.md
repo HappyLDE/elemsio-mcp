@@ -32,7 +32,8 @@ protected `section` ownership type) with `elems_update_element_dom_type`. Inspec
 `dom_type_targets[]`, pass its exact `target_id` and `dom_type_hash`, and select the destination from
 the tool's closed enum. Invalid structures (for example, children under a destination `img`),
 dynamic/script/embed-owned targets, shared/prefab structures, roots, and shell/declaration types are
-rejected. Declaration/head types such as `link` are intentionally outside this capability.
+rejected. Declaration/head types such as `link` remain outside ordinary Markup V1 and DOM-type
+mutation. The separate template head-declaration capability supports only its closed safe profiles.
 
 ## Identity is operation-specific
 
@@ -44,6 +45,7 @@ mutation-ready identifier and fresh hash emitted by the matching inspection surf
 | Localized text/attribute, `href`, or image `src` | `elements[].update_target_id` and current value/hash |
 | Classes | `class_targets[].mdid` and `classes_hash` |
 | DOM type | `dom_type_targets[].target_id` and `dom_type_hash` |
+| Head stylesheet declaration | `head_declarations.head.children_hash`, then the declaration `target_id` and `declaration_hash` for removal |
 | Behavior | `behavior_targets[].target_id` and `behavior_hash` |
 | Existing owned JavaScript | `script_targets[].target_id` and `script_hash` |
 | HTML Embed | `html_embeds[].mdid` and `embed_hash` |

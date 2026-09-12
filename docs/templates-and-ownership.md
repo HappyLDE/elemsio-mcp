@@ -37,6 +37,26 @@ through the template insertion contract and the shared allowlist; validate first
 `elems_validate_template_element`. Page insertion is static-only outside the exact auth/account
 profile supported by section validation/import.
 
+## Safe head declarations
+
+`elems_get_template_elements` exposes `head_declarations` separately from ordinary structural
+targets. Its `head.children_hash` is the creation/removal structure precondition; each inspected
+stylesheet declaration also has a stable target, whole-declaration hash, ownership, and removability.
+
+`elems_create_head_declaration` currently accepts only the closed `stylesheet_link` profile and one
+absolute external HTTPS `href`. The server creates exactly `<link rel="stylesheet" href="…">` under
+the canonical template `<head>` with no extra attributes, content, children, scripts, or behavior.
+Exact duplicate URLs return `already_exists` without a write.
+
+`elems_remove_head_declaration` removes only declarations carrying safe-API ownership established at
+creation, with both the declaration hash and enclosing head children hash as CAS preconditions. The
+canonical command-owned `templateCssUrl` stylesheet and existing declarations of unknown provenance
+are inspectable as protected and cannot be changed or removed. `script`, `meta`, inline `style`, raw
+head HTML, arbitrary attributes, and `link` elements in body Markup V1 remain unsupported. Both tools
+regenerate every active-locale template draft, compensate on failure, and never publish.
+Ordinary template insertion/deletion and DOM-type tools also reject the head declaration subtree, so
+they cannot bypass this ownership boundary.
+
 Template-owned images follow the same isolation rule: inspect the effective template, then mutate an
 eligible `attribute:src`/localized `attribute:alt` target or insert canonical Markup V1 in template
 scope. Image sources must be exact canonical URLs from the same website's ELEMS Media. A page-scoped
