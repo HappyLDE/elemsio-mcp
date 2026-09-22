@@ -42,6 +42,14 @@ modify orders or historical access grants through authoring tools.
 
 ## Promotions and purchased resources
 
+Website owners can inspect canonical shipping-country and zone configuration with
+`elems_list_shipping_countries`, then add or update one supported country with
+`elems_configure_shipping_country` using the fresh website configuration revision. Costs use major
+units of the website currency; zero is valid. The tools operate on the existing shipping-zone model
+that feeds Runtime `shippingCountries`. Shared-zone, legacy-rate, duplicate, catch-all, or otherwise
+ambiguous settings are rejected when a targeted update could affect another country. Removal is
+available only for an isolated matching zone with no rates, carts, or orders.
+
 Promo tools list, create, and CAS-update website-scoped global percentage codes. Quote with
 `elems_quote_promo_code`; clients never supply or calculate the authoritative discount amount.
 
