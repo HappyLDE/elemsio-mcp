@@ -40,6 +40,15 @@ Checkout/payment behavior is generic platform functionality. Do not expose or se
 credentials, raw payment endpoints, internal payment data, sessions, or customer identity. Do not
 modify orders or historical access grants through authoring tools.
 
+## Website currency
+
+Use `elems_list_shipping_countries` to inspect the current Website currency context and its
+`currency_revision`. Then use `elems_add_website_currency` with a canonical currency code and that
+fresh revision. When no default currency exists, the added currency becomes the Website default. When
+a default already exists, the tool adds an available currency without changing the default. Duplicate
+currencies are rejected, matching the Settings flow. The tool uses the existing shared currency
+catalog and Website Settings persistence; it does not migrate product prices, orders, or payments.
+
 ## Promotions and purchased resources
 
 Website owners can inspect canonical shipping-country and zone configuration with
