@@ -40,7 +40,7 @@ exception. Template insertion may carry validated `fn`, flat `fnData.*`, and `cm
 | `clientOrderDetail` | Authenticated order-detail source | `identifierParam` |
 | `urlParams` | Route-query condition provider on the containing runtime region | none |
 | `product` | One direct product card/detail context | `productId` |
-| `cart` | Cart summary/items/shipping context | none |
+| `cart` | Cart summary/items/shipping context; optional empty resource checkout presentation | `presentation`, `productId` |
 | `paymentMethods` | Available payment-method list context | none |
 | `checkoutPaymentMethods` | Checkout payment-method context; aliases the payment-method command scope | none |
 | `posts` | Generic structured-content list/detail source | `postsIdentifierId`, `mode`, `parentId`, `postId`, `postSlug`, `use_suffix_slug`, `access_mode` |
@@ -84,3 +84,9 @@ loop and value bindings are documented in `elems://docs/commands`.
 Generic capabilities belong in generic primitives. A site-specific requirement is not a reason to
 invent a new core function type. If the allowlist and tools cannot express it, stop and report the
 platform limitation.
+
+An empty `cart` provider with `presentation="resource_checkout"` and a same-website positive
+`productId` renders the generic resource-product purchase surface. Custom children/content/embeds
+retain custom rendering. This presentation requires an authenticated buyer; TEST products require
+a canonical technical QA buyer. Prices come from the catalog, quantities are one, and a pending
+order grants no access. The TEST payment action is disabled without a sandbox provider.
