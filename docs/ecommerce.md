@@ -69,3 +69,18 @@ with an inspected posts function using `access_mode="granted"`.
 Ownership remains website/entity scoped throughout. If a required catalog, checkout, payment, order,
 or variant operation is not exposed, report that limitation; do not use admin procedures or private
 provider details.
+
+## Internal TEST resource checkout
+
+`elems_configure_test_product_checkout` accepts an existing unpublished digital TEST product and
+exact expected minor-unit price, visibility, and resource-grant hash. It preserves unrelated
+variant metadata, marks `test_checkout` version 1/enabled, and makes the product purchasable only
+by `commerce_qa` accounts. Draft translations remain unpublished. Runtime denies live payment
+for these products. This operation cannot create an account, order, payment, or entitlement.
+
+Publish a page-owned empty `cart` provider with `presentation="resource_checkout"` and `productId`
+using the canonical element behavior tool. It renders the current catalog price, TEST indicator,
+buyer identity, one-access cart, unpaid-order creation and cancellation, and payment availability.
+Pending orders freeze their selection; cancel and start another cart to change it. Resource
+entitlements are created only by server-verified paid-order completion, linked to OrderItem.
+A missing sandbox is an external configuration boundary; never emulate a paid production order.
