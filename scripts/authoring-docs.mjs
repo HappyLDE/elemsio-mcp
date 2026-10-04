@@ -63,6 +63,13 @@ export const authoringDocs = [
     file: 'docs/media.md',
   },
   {
+    name: 'elems-docs-menus',
+    uri: 'elems://docs/menus',
+    title: 'ELEMS Website Menu Authoring',
+    description: 'Native Page-ID, custom URL, collection slug, and unsupported anchor destination semantics.',
+    file: 'docs/menus.md',
+  },
+  {
     name: 'elems-docs-localization',
     uri: 'elems://docs/localization',
     title: 'ELEMS Localization',
