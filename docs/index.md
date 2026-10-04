@@ -13,6 +13,7 @@ same task.
 | [functions](functions.md) · `elems://docs/functions` | Attaching or interpreting `functionType` and `functionData` | Static content/layout work |
 | [commands](commands-runtime.md) · `elems://docs/commands` | Loops, conditions, runtime values, or command parameters | Static pages with no runtime bindings |
 | [media](media.md) · `elems://docs/media` | Discovering/uploading website assets or using media references | No asset work |
+| [menus](menus.md) · `elems://docs/menus` | Listing or authoring website menu items, including native Page destinations | No menu work |
 | [localization](localization.md) · `elems://docs/localization` | Adding locales, editing locale-specific values, selectors, routes, or fallback | A known single-locale, nonlocalized change |
 | [forms](forms-and-interaction.md) · `elems://docs/forms` | Forms, auth/account behavior, links/buttons, embeds, or owned JavaScript | Pure styling |
 | [content](content-primitives.md) · `elems://docs/content` | Generic collections and `MdPost` records, listings, detail pages, or protected resources | Ordinary page copy |
