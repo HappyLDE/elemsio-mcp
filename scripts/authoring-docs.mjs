@@ -66,7 +66,7 @@ export const authoringDocs = [
     name: 'elems-docs-menus',
     uri: 'elems://docs/menus',
     title: 'ELEMS Website Menu Authoring',
-    description: 'Native Page-ID, custom URL, collection slug, and unsupported anchor destination semantics.',
+    description: 'Native Page-ID and optional safe fragment, custom URL, and collection destination semantics.',
     file: 'docs/menus.md',
   },
   {
