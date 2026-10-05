@@ -9,7 +9,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8')
 
 test('authoring documents are focused, bounded, and uniquely routed', () => {
-  assert.equal(authoringDocs.length, 14)
+  assert.equal(authoringDocs.length, 15)
   assert.equal(new Set(authoringDocs.map(({ uri }) => uri)).size, authoringDocs.length)
   assert.equal(new Set(authoringDocs.map(({ name }) => name)).size, authoringDocs.length)
 
