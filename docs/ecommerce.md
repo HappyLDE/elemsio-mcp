@@ -137,15 +137,21 @@ existing default. Product publication does not stage/release pricing, cover, inv
 1. Resolve Website and existing draft Product; read the intended locale and all Variant identities.
 2. Author localized presentation; read again after every mutation.
 3. Associate existing cover Media; set/reuse the real Website currency and Variant prices.
-4. Set default Variant, canonical availability and visibility; remove QA restriction for each Variant
-   offered to ordinary customers. Resource associations remain a separate explicit grants operation.
-5. Inspect draft/published differences, readiness, and customer-dependent requirements.
-6. Explicitly publish each intended active locale using its fresh hash.
+4. Set default Variant and canonical availability while keeping visibility 0 or the existing QA
+   restriction. Resource associations remain a separate explicit grants operation.
+5. Inspect draft/published differences and requirements; explicitly publish each intended active
+   locale using its fresh hash while the commercial isolation control remains in place.
+6. Use one commercial operation to activate catalog visibility and ordinary eligibility for the
+   default Variant together. Activate any other required Variants explicitly.
 7. Read customer readiness separately from persisted provider configuration. Compose/qualify the
    existing storefront through its normal page/provider tools; Product authoring does not create pages.
 8. Unpublish/republish deliberately when required. Publication updates the selected locale only.
 
 ### Readiness diagnosis
+
+Some existing direct/cart routes do not universally enforce translation publication. Keep visibility
+0 or the existing QA gate until presentation is published; publication alone is not an isolation
+gate. Commercial visibility, cover, inventory and pricing changes are immediately live.
 
 `readiness.customer_product_ready` requires the selected locale published, visibility >0, an owned
 default Variant, positive integer price, currency, available stock/preorder and ordinary eligibility.
