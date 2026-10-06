@@ -184,3 +184,10 @@ and never calls Stripe/PayPal. Use the normal checkout/confirmed-payment fulfill
 Qualification uses run-owned disposable Website lifecycle provisioning/retirement; never modify a
 customer Website to test the tool. Retire all disposable Product/Variants/Media/resources with the
 canonical Website cleanup, including public storage objects.
+
+`readiness.website_online_payments` reuses the canonical Website subscription capability: it reports
+`subscription_eligible`, `subscription_reason`, and `runtime_enforcement_checked=false`. A missing
+subscription adds `subscription_required_for_online_payments` to `checkout_requirements`. This is
+separate from Product/customer readiness and persisted provider configuration; it never changes a
+subscription or proves Runtime enforcement/configuration. The existing `elems_get_context.ecommerce`
+also exposes `online_payments_available`.
