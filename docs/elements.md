@@ -97,3 +97,40 @@ To change one card heading, search distinctive text, inspect the returned subtre
 heading's `elements[].update_target_id`, preserve the exact current-value precondition, update one
 locale, and read it back. Do not replace the card or its section merely because the search suggested
 the section as an inspection root.
+
+## Move and reparent existing elements
+
+`elems_move_element` supports Page and Template ownership. Existing calls remain compatible:
+`website_id` plus `page_id` uses Page scope when `scope` is omitted or `page`. Template calls require
+`scope: template`, `website_id`, and `template_id`; omit `page_id`. Cross-owner and cross-Website
+moves are forbidden, even when element IDs collide.
+
+Read fresh `move_context` from `elems_get_page_elements`, `elems_get_element_subtree`, or
+`elems_get_template_elements`. Choose exact `target_mdid` with `can_move: true` and
+`destination_parent_mdid` with `can_parent: true`; pass its whole-root `tree_hash` unchanged as
+`expected_tree_hash`. Template inspection also exposes existing draft/published revisions.
+
+Use `placement: before | after | first | last`. Before/after requires `anchor_mdid`, a different
+ordered direct child of the destination. First/last forbids an anchor. Position is computed after
+removing the existing source: A B C D, move D after A, becomes A D B C. Reparenting uses the same
+operation between supported neutral containers. Template destinations include body and ordinary
+header/main/footer containers; fixed header/footer regions can contain moved ordinary descendants.
+Roots, HTML shell, head declarations, content slots, shared prefabs, cycles, invalid anchors,
+incompatible list/select/picture children, and inherited runtime data contexts fail closed.
+
+The exact existing element and descendant mdids, complete subtree, localized content, attributes,
+classes/responsive classes, Media, links, behavior/action bindings, and script metadata survive.
+Only containment and sibling order change. This operation does not create or delete elements,
+accept arbitrary tree fields, edit scripts, or promise to rewrite ancestry-dependent custom scripts.
+
+Supply a distinct `idempotency_key` for each new intent (8–128 alphanumeric/dot/underscore/colon/
+hyphen characters, beginning alphanumeric). Retry only with the same key and exact arguments.
+Cached success returns `already_applied`; an already-current fresh placement returns `already_current`.
+The bounded process-local authoring cache is not durable: after cache loss or across workers a
+stale tree hash conflicts and cannot reapply the move. Concurrent conflicting moves have one winner.
+
+Moves regenerate every active-locale owner draft and never publish. Template preview uses the moved
+draft while live uses its prior published Template. Read fresh revision and publish separately with
+`elems_publish_template`; Page publication continues through `elems_publish_page`. A generation
+failure compensates only its own exact post-move root under CAS. Later edits prevent compensation
+and return `RECOVERY_REQUIRED` without overwriting them.
