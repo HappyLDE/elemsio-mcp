@@ -10,12 +10,19 @@ concurrency:
   cancel-in-progress: true
 jobs:
   documentation-contract:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64, elems-ci, elems-lenovo-vm]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - name: Verify isolated CI workspace
+        run: |
+          test "$RUNNER_WORKSPACE" = /opt/actions-runner/_work/elemsio-mcp
+          test "$GITHUB_WORKSPACE" = "$RUNNER_WORKSPACE/elemsio-mcp"
+          test ! -e /home/leosilver
+          test ! -e /home/runner/probe-contamination
+          printf 'Runner: %s\nWorkspace: %s\n' "$RUNNER_NAME" "$GITHUB_WORKSPACE"
       - uses: actions/setup-node@v6
         with:
           node-version: 22
