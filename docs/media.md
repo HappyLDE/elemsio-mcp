@@ -54,3 +54,48 @@ elems_list_media or finalize upload -> retain exact canonical image URL
 
 Protected `ResourceAsset` uploads are a different, access-controlled content-delivery contract. Do
 not use protected assets as public page media or expose their signed part URLs.
+
+## Website favicon / site icon
+
+Favicon is Website identity, independent from Page OG/social Media, header/footer logos,
+Product images and Course covers. MCP does not generate imagery or transform an image.
+Use existing canonical public Website Media (`elems_list_media`) or the normal signed upload flow.
+Protected ResourceAssets, foreign Website/Entity Media and external arbitrary URLs are ineligible.
+
+Read `elems_get_context.favicon`: `contract_version=website-favicon.v1`, `media_id`, `configured`,
+`effective_state` (`configured`, `unconfigured`, `unavailable`), `source`, `favicon_hash`,
+`media` (ID, canonical public URL, MIME, width, height, derivative URLs), and
+`effective_at=immediate`. Unavailable references expose no usable URL. `source=legacy_template`
+means the Website has never been explicitly managed; existing compiled Template browser icons
+may still apply. This readback does not claim to inspect legacy Template HTML.
+
+Call `elems_set_website_favicon` with `website_id`, fresh `expected_favicon_hash`, and `media_id`.
+A positive ID sets/replaces the favicon; `null` explicitly clears it. No arbitrary Website fields
+are accepted. Every change becomes effective on the next Runtime render, including every locale,
+without Page or Template publication. `publish_performed=false` does not imply a draft: this is
+an immediate Website setting. Same-value retries return `already_current`; stale conflicting
+writes return CONFLICT. Read again before another change. A monotonically increasing Website
+favicon revision protects against concurrent conflicts and A→B→A stale edits.
+
+Supported types: `image/png`, `image/jpeg`, `image/webp`, `image/svg+xml`. The existing public object
+must match its canonical Media extension/MIME and decode successfully; SVG active/external content
+is rejected. ICO (`image/x-icon`, `image/vnd.microsoft.icon`) is browser compatible, but this contract
+rejects it because ELEMS currently lacks validated ICO public Media processing. GIF and all other
+MIME types are also outside this bounded contract. PNG is recommended for broad compatibility; a
+small, legible icon with transparency and a square canvas, commonly 32×32 or 48×48, works well.
+Square dimensions are recommendations, never requirements. Source dimensions/aspect ratio are
+preserved; association performs no resize, conversion, duplication or upload.
+
+Runtime emits one `<link rel="icon" href="CANONICAL_PUBLIC_MEDIA_URL" type="MIME">`. SVG adds
+`sizes="any"`; raster sizes are omitted. An explicitly managed Website takes precedence over
+legacy `icon` / `shortcut icon` links; clear removes them. Touch icons, mask icons and PWA manifests
+are preserved. Websites never managed by this operation keep their existing Template declarations
+and receive no forced ELEMS logo. Website data and Media eligibility are read each request; no
+compiled Page republish or broad cache flush is required. Browser image caching may retain the
+same URL; replacing Media uses its different canonical URL. Clear returns HTML without the old icon.
+
+Clear or replace a current favicon before deleting its public Media. Canonical Website retirement
+removes Website/Media state through the existing lifecycle, including public objects.
+
+Standards references: [HTML icon relation](https://html.spec.whatwg.org/multipage/links.html#rel-icon),
+[browser image formats](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types).
