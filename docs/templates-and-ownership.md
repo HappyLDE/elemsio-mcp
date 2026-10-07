@@ -31,6 +31,36 @@ elems_get_page -> retain effective template_id
 -> elems_publish_template only when explicitly requested
 ```
 
+## Independent detached templates
+
+`elems_list_templates` returns the complete pageable Modern V2 inventory, including templates that
+no page uses. Use the returned cursor until `has_more` is false. `elems_create_template` provisions
+an independent V2 shell and draft. It does not change the website default or assign existing pages;
+the idempotency key is required for safe retries.
+
+Detached templates use the same template tools without `page_id`: inspect with
+`elems_get_template_elements`, then use the returned structural and behavior targets with
+`elems_validate_template_element`, `elems_insert_template_element`, `elems_update_element`, and
+`elems_delete_element`. The API verifies the template belongs to the scoped website and resolves its
+Mongo root directly; it does not invent a page context or substitute the website default. A
+`functionType: "menu"` provider must reference a menu owned by that same website.
+
+Generate a draft with `elems_generate_template_draft`, passing the current
+`expected_draft_revision`. For CSS needed by existing pages, pass their bounded IDs in
+`coverage_page_ids`. The returned manifest records each page fingerprint. Template edits retain the
+declared coverage set; a page whose content or class registry changes makes coverage stale until the
+draft is generated and published again with fresh coverage. Publish the detached template with
+`elems_publish_template` and the exact returned draft revision. Publication changes only the
+template artifacts.
+
+To attach an existing V2 page, pass the fresh `ta:<revision>` token to
+`elems_assign_page_template` with `operation: "assign"`. The target must be published, current, and
+cover that page's current fingerprint. The operation returns its before/after mapping and a receipt
+ID. Assignment changes live template composition immediately; it does not publish or regenerate the
+page. To reverse it, inspect the page again, then call the same tool with `operation: "reverse"`, the
+receipt ID, and the new current assignment revision. A stale revision or intervening assignment
+blocks reversal.
+
 Template text and behavior updates, class changes, JavaScript replacement, insertion, and deletion
 each have distinct targets and CAS hashes. Behavior-capable Markup V1 insertion is available only
 through the template insertion contract and the shared allowlist; validate first with
