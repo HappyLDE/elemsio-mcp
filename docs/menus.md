@@ -1,5 +1,15 @@
 # Website menu authoring
 
+Create one empty website menu container with `elems_create_menu`, using an active website locale,
+bounded display name, and idempotency key. It returns the canonical menu revision and a zero-item
+readback. Add or change items only through the existing `elems_manage_menu` lifecycle, reading the
+latest revision before each write.
+
+In a V2 template, the canonical provider behavior is `functionType: "menu"` with
+`functionData.menuId: "<menu id>"`. Author it through the existing detached template behavior or
+Markup V1 tools. A provider reference is accepted only when the menu belongs to the same scoped
+website. Desktop and mobile provider elements may reference the same menu container.
+
 Use `elems_list_menus` to resolve a menu and inspect its current `revision` before every write. Pass
 that exact revision to `elems_manage_menu`; the tool returns refreshed menu readback.
 

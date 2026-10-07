@@ -3,6 +3,13 @@
 Load this resource for page creation, page-owned content, draft lifecycle, preview, publication, and
 structural mutation safety.
 
+Existing V2 template assignments use `elems_assign_page_template`. Read the current page and pass
+its exact assignment token, such as `ta:4`. Assignment requires a same-website published template
+with current CSS coverage for the page. It immediately changes the template used by live composition
+and does not publish or recompile the page. The response includes the prior mapping and an operation
+receipt; reverse with that receipt and a fresh assignment token. Stale writes and intervening
+assignments are rejected.
+
 ## Page creation
 
 `elems_create_page` creates one non-root modern V2 draft page. It accepts a bounded plain-text title,

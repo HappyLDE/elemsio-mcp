@@ -47,7 +47,8 @@ allowlisted does not create its required function, catalog object, session, cart
 append websiteName templateCssUrl formInput userEmail currentYear pageTitle pageMetaDescription
 pageOgImage localeCode localeName localeUrl localeLang localeHrefLang localeIconUrl localeIsCurrent
 currentLocaleCode currentLocaleName currentLocaleIconUrl localeItems menuName menuItems menuItemName
-menuItemUrl menuItemHasChildren menuItemHasIcon menuItemIcon menuSubItems menuSubItemName menuSubItemUrl menuSubItemHasChildren menuSubItemHasIcon menuSubItemIcon
+menuItemUrl menuItemIcon menuItemHasIcon menuItemHasChildren menuSubItems menuSubItemName menuSubItemUrl
+menuSubItemIcon menuSubItemHasIcon menuSubItemHasChildren
 menuSubSubItems menuSubSubItemName menuSubSubItemUrl collectionName productsCollectionName
 productsCollectionItems productsCollectionItemProductName productsCollectionItemMetaDescription
 productsCollectionItemProductPrice productsCollectionItemProductPriceCompare
@@ -119,7 +120,7 @@ Loop-capable commands are `productsCollectionItems`, `productsCollectionPaginati
 
 Conditional commands are the boolean/status subset accepted by inspection and validation, including
 session (`loggedIn`), URL parameter checks, empty/has-items and pagination flags, form result flags,
-cart/address/payment state, menu-child state, locale current state, and compare-at/image presence.
+cart/address/payment state, menu-child and menu-icon presence, locale current state, and compare-at/image presence.
 The tool validator is authoritative for the exact subset and parameters.
 
 ## Common mistakes
