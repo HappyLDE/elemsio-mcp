@@ -15,6 +15,10 @@ includes `page_id`, the canonical slug, and the fragment when present. URL desti
 `type: "url"` with their `url`. Avoid passing a leading-slash route such as `/servicii` for a Page: the
 renderer owns the base path and the native destination stores the page slug.
 
+When `elems_update_page` changes a Page slug, matching native `type: "page"` menu destinations are
+updated to the new canonical slug in the same transaction. They continue to resolve to the same Page
+ID; custom URL destinations are unaffected.
+
 Fragments are limited to 1–128 ASCII letters, digits, `.`, `_`, `~`, `:`, or `-`, starting with a
 letter or digit. A leading `#`, slash, query delimiter, control character, markup, or executable value
 is rejected. Query-string support is not part of this field. Page destinations without a fragment,
