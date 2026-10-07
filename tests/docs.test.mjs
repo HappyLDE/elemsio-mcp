@@ -52,6 +52,13 @@ test('important authoring rules stay in their owning documents', () => {
   assert.match(read('docs/media.md'), /Audio and video are not accepted/)
   assert.match(read('docs/localization.md'), /current_value: null/)
   assert.match(read('docs/templates-and-ownership.md'), /shared_prefab/)
+  const pages = read('docs/pages-and-drafts.md')
+  assert.match(pages, /`elems_update_page`/)
+  assert.match(pages, /stable `page_id`/)
+  assert.match(pages, /atomic/)
+  assert.match(pages, /case-insensitively/)
+  assert.match(pages, /native\s+Menu Page destinations/is)
+  assert.doesNotMatch(pages, /cannot .*rename|cannot .*mutate an existing slug/i)
 })
 
 test('public documents contain no consumer-irrelevant operational material', () => {

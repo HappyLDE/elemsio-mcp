@@ -11,8 +11,23 @@ uses the current website-owned effective/default template. It initializes every 
 generates drafts, but never publishes.
 
 Duplicate normalized slugs conflict. The tool cannot create or replace a homepage, create a template,
-rename/archive/delete a page, or mutate an existing slug. Use `elems_list_pages`, `elems_get_page`,
-and the returned effective-template and publication metadata rather than guessing state.
+or archive/delete a page. Use `elems_list_pages`, `elems_get_page`, and the returned
+effective-template and publication metadata rather than guessing state.
+
+## Page identity updates
+
+Use `elems_update_page` with the required `website_id` and stable `page_id` to update `title`,
+`slug`, or both. A title applies to `locale_code` when supplied, otherwise the website default locale;
+other locale titles are preserved. Slugs use the same normalization as page creation: one safe
+segment is lowercased and slugified; root, nested paths, URL syntax, markup, and unsupported
+characters are rejected. A normalized slug that matches another Page in the same website
+(case-insensitively) conflicts; the current Page is excluded from that check.
+
+The update is atomic. It preserves Page ID, website ownership, content/elements, template, other
+translations, SEO metadata, publication state, and Page-ID-based relationships. Matching native
+Menu Page destinations are updated to the new canonical slug in the same transaction and remain
+native Page destinations. Read the canonical identity from the update result or `elems_list_pages`.
+This operation does not create, publish, or archive Pages.
 
 ## Canonical edit lifecycle
 
