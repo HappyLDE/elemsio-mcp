@@ -31,3 +31,7 @@ Common routes:
 
 Expand documentation scope only when the task expands or a current uncertainty requires it. If the
 required capability is absent from tools and these resources, stop and report the limitation.
+
+Website favicon/site-icon identity: read `elems_get_context.favicon`, then use
+`elems_set_website_favicon` for existing Media set/replace or null clear. Load
+`elems://docs/media` for eligibility, CAS and immediate Website semantics.
