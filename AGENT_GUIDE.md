@@ -19,6 +19,13 @@ resource it recommends. Do not load the complete authoring corpus by default.
   only when that removal is explicitly required by the requested outcome.
 - Read immediately before compare-and-set writes and verify afterward. Keep page/template edits as
   drafts, preview meaningful changes, and perform browser QA after visual or interactive changes.
+- Public Page SEO readiness is part of completion for new/materially updated Pages unless the user
+  explicitly opts out; minor cosmetic edits verify without rewriting good SEO. Before publication or
+  final acceptance, read [the canonical public Page SEO policy](docs/pages-and-drafts.md#public-page-seo-definition-of-done)
+  (`elems://docs/pages` describes the Page SEO capability). Check effective title/description,
+  canonical/production domain, OG/Twitter, duplicates, relevant existing Website Media, and locale.
+  Respect private/auth-only indexing boundaries. Report compact SEO status and `OG IMAGE MISSING`
+  when no suitable existing image exists; that alone does not block completion unless required.
 - Publication is a separate deliberate tool call. Never publish as a side effect of another edit.
 - Use ELEMS Media for public hosted assets. Published pages must not refer to local filesystem paths
   or temporary chat URLs.
