@@ -55,6 +55,12 @@ mutation-ready identifier and fresh hash emitted by the matching inspection surf
 `snapshot_target_id` is read-only metadata. Do not construct namespaced target IDs, strip parts from
 them, substitute a search-result `target_id`, or guess an `mdid`.
 
+For a native contact form, inspect `behavior_targets[].contact_form` together with its ordinary
+element attributes and command bindings. The descriptor reports whether the provider is on a
+semantic `<form>`, its POST method, type and recipient, native field types/bindings/required flags,
+the Runtime challenge, explicit submit type, and success/error state bindings. A provider attached
+to a `div` is not a semantic contact form.
+
 Some older builder-authored links may expose a current `href` beginning with the exact canonical
 `{{ base_url }}` prefix. This is a migration-ready precondition, not accepted new content: pass the
 returned value and hash back unchanged as the expected state, then replace it with a normal safe
