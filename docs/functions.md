@@ -133,3 +133,8 @@ separately through `elems_publish_page` with freshly inspected publication state
 
 Capacity is read-only. Current Runtime does not enforce seat limits. These tools do not activate public
 registration, create registrations, modify historical records, or deploy Stage 3A protected admission.
+
+For inactive session checkbox preparation and legacy Event mirror inspection, use
+`elems_get_event_session_bindings`, `elems_validate_event_session_bindings` and
+`elems_configure_event_session_bindings` as documented in `elems://docs/forms-and-interaction`.
+Generic Event/checkbox command mutation remains protected.
