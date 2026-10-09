@@ -138,3 +138,10 @@ For inactive session checkbox preparation and legacy Event mirror inspection, us
 `elems_get_event_session_bindings`, `elems_validate_event_session_bindings` and
 `elems_configure_event_session_bindings` as documented in `elems://docs/forms-and-interaction`.
 Generic Event/checkbox command mutation remains protected.
+
+Opt-in dynamic session selectors are configured through `elems_get_event_session_selector`,
+`elems_validate_event_session_selector` and `elems_configure_event_session_selector` (MCP 1.61.0).
+Read `elems://docs/forms` for conversion, inactive preparation and published-snapshot semantics.
+`eventSessionSelector`, `event` and `eventItem` stay outside generic function/command mutation.
+Canonical Event session updates accept optional `localized_titles`, `retired` and bounded integer
+`order`; all existing identities remain in the configuration and historical registrations are retained.
