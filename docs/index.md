@@ -10,7 +10,7 @@ same task.
 | [styling](styling-tailwind.md) · `elems://docs/styling` | Editing classes, responsive layout, visual composition, or Tailwind/JIT behavior | Text-only edits |
 | [pages](pages-and-drafts.md) · `elems://docs/pages` | Creating/editing pages, drafts, previews, publication, or structural safety | Template-only conceptual questions |
 | [templates](templates-and-ownership.md) · `elems://docs/templates` | Shared headers/footers, effective templates, template ownership, or template publication | Page-owned section edits |
-| [functions](functions.md) · `elems://docs/functions` | Attaching or interpreting `functionType` and `functionData` | Static content/layout work |
+| [functions](functions.md) · `elems://docs/functions` | Attaching or interpreting `functionType` and `functionData`, or configuring native Events through dedicated tools | Static content/layout work |
 | [commands](commands-runtime.md) · `elems://docs/commands` | Loops, conditions, runtime values, or command parameters | Static pages with no runtime bindings |
 | [media](media.md) · `elems://docs/media` | Discovering/uploading website assets or using media references | No asset work |
 | [menus](menus.md) · `elems://docs/menus` | Listing or authoring website menu items, including native Page destinations | No menu work |

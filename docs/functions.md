@@ -90,3 +90,46 @@ An empty `cart` provider with `presentation="resource_checkout"` and a same-webs
 retain custom rendering. This presentation requires an authenticated buyer; TEST products require
 a canonical technical QA buyer. Prices come from the catalog, quantities are one, and a pending
 order grants no access. The TEST payment action is disabled without a sandbox provider.
+
+## Native Events through the canonical Events domain
+
+MCP 1.59.0 adds four dedicated tools. `event` and `eventItem` remain forbidden in generic behavior
+updates, imports and template insertion; use the typed Event workflow:
+
+1. `elems_list_events` discovers the same native Events as the Events dashboard, with bounded
+   pagination, session identities, integrity diagnostics and page publication information.
+2. `elems_get_event_configuration` inspects an owned Modern page and optional Event. Before creation,
+   omit `event_id` to discover eligible existing containers, descendant cards and existing native
+   registration forms. Read `configuration.root_id` and the opaque whole-source `revision` unchanged.
+   With `event_id`, read current sessions, marked metadata, canonical Mongo configuration, generated
+   SQL configuration, and per-locale draft/published state. Generated configuration can be refreshed
+   before publication and is not a published snapshot. No participant records are exposed.
+3. `elems_validate_event_configuration` validates a complete proposed configuration through the same
+   domain planner and historical identity checks as saving, without writes or generation. Validation
+   reserves nothing; a subsequent save repeats all checks against the revision.
+4. `elems_configure_event` creates or updates exactly one Event. Use `operation=create` with the exact
+   existing `container_id`, or `operation=update` with the exact existing `event_id`. Include the page,
+   root, revision, name, `registration_form_id` (existing descendant form ID or empty string), and the
+   complete `sessions` list. Each of at most 200 sessions requires an existing eligible descendant
+   `element_id`, a plain title, full ISO start/end timestamps with seconds and explicit offset, and an
+   IANA timezone. Offsets must match the zone; no missing dates/times may be invented. Include every
+   existing session unchanged unless deliberately configuring it. No session removal, movement,
+   reassignment, capacity changes, arbitrary functionData, or new visible structure is accepted.
+
+All four operations require website owner/admin authorization. The API rechecks website/entity/page,
+Modern template/root ownership, globally aliased roots, target eligibility, source deletion, duplicate
+and nested identities, historical registration references, and full-source concurrency. Mongo is the
+only authoring source; the existing compiler regenerates `element_functions` and all active-locale
+drafts. Existing IDs, children, classes, styling and unrelated locale content are preserved. Missing
+metadata is hidden. Existing marked title/date edits are deliberate: inspect `updates_visible_content`
+before editing them. Registration form association preserves existing inputs and submission behavior;
+it does not create, repair or activate a public form. Keep visual registration prototypes unchanged.
+
+Configuration never publishes. A successful source write reports `source_saved=true`, `draft_only=true`
+and `draft_status=generated` or `regeneration_required`. If generation fails, read the saved Event and
+use existing draft regeneration; do not replay creation with stale input. Read back canonical and
+generated configuration, use the ordinary page preview, and publish each explicitly authorized locale
+separately through `elems_publish_page` with freshly inspected publication state.
+
+Capacity is read-only. Current Runtime does not enforce seat limits. These tools do not activate public
+registration, create registrations, modify historical records, or deploy Stage 3A protected admission.
