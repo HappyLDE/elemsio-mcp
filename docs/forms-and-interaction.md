@@ -86,6 +86,47 @@ authorized canonical handler/semantic-form configuration, `eid` owner routing an
 personal inputs. Current Runtime does not enforce capacity; Stage 3A safety must be accepted/deployed
 before relying on seat limits.
 
+## Dynamic native Event session selector (MCP 1.61.0)
+
+Use this opt-in preset when Events must own session labels, schedules, membership and order.
+Existing explicit checkboxes and eventMirror forms are never migrated automatically.
+
+1. Read `elems_get_event_session_selector` for an owned Website/Page/Event/form. It returns canonical
+   localized choices, inspected wrapper IDs and exact `replace_child_ids`, bounded style slots,
+   inactive-submit state and actual compiled draft/published choices with diagnostics.
+2. Choose one existing wrapper containing only the session-selection UI. Validate with
+   `elems_validate_event_session_selector`: fresh root/revision, `selector_id`, `form_id`, `event_id`,
+   `preset: native_event_sessions`, `mode: inactive` and the exact complete `replace_child_ids`.
+   Replacement is explicit; personal fields, consent, unrelated interactive children, mixed/dynamic
+   context, mirrors, active form providers and enabled submits are rejected. Empty wrappers use `[]`.
+3. Pass that exact validated proposal to `elems_configure_event_session_selector`, then read back.
+   Optional class slots are `row_classes`, `input_classes`, `label_classes`, `date_heading_classes`
+   and `group_classes`; the selected wrapper's own content/classes/attributes are preserved.
+   Do not store session labels, timestamps, membership or date groups in editable form children.
+4. Manage sessions only with the canonical Events workflow. `localized_titles` changes title markers,
+   `order` sets deterministic selection order without moving agenda cards, and `retired: true`
+   removes selectable choices while retaining source/session identities and registrations. Include
+   every existing session identity; omission/deletion is still forbidden.
+5. Publication is separate and deliberate for each locale. Source saves generate drafts only.
+   `regeneration_required` needs readback and draft recovery, never stale replay.
+
+The ordinary compiler creates accessible unchecked checkbox/label pairs, canonical eventItem names,
+unique selector/session DOM IDs, localized titles and local date/time headings with explicit IANA/DST
+semantics. One existing hidden eventid is retained. No independent session IDs, label/date copies,
+raw functionData, commands, new registration mechanism or Runtime mirror loop is exposed.
+
+A scope-validated generated snapshot accompanies each compiled page artifact. Public rendering and
+registration validation use the last published page/locale snapshot; preview rendering uses the draft.
+Hidden eventchoices revision tokens reject stale selections, wrong Event owners and retired/unknown
+session IDs before registration side effects. Draft SQL projections cannot activate the form. Legacy
+unconverted pages retain their previous behavior. Both retained Runtime releases must understand the
+snapshot contract before real conversions.
+
+Preparation preserves disabled submits and never sets formType=event_registration, publishes, edits
+capacity, creates registrations or sends mail. Later live registration requires separately authorized
+semantic-form/handler setup and acceptance of the relevant admission safety. Runtime still does not
+enforce seat limits. No existing website is converted as a side effect of installing this capability.
+
 ## Auth/account presets
 
 For storefront login, registration, logout, authenticated/guest branches, current-user email, order
