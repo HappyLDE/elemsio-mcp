@@ -75,8 +75,8 @@ IDs; unchecked native checkboxes submit no field. The legacy mirror generates th
 Explicit controls do not depend on legacy loop recompilation.
 
 Mutations accept inactive neutral form prototypes only. Form providers, actions, mixed/dynamic context,
-script/embed ownership and enabled buttons/submit inputs are rejected. Active native forms and mirror
-templates are inspection-only. The tool never sets `formType=event_registration`, changes submit state,
+script/embed ownership and submit controls left enabled in the planned result are rejected. Active
+native forms and mirror templates are inspection-only. The tool never sets `formType=event_registration`, enables submits,
 rewrites personal fields/consent, touches Event/session metadata or capacities, sends email, creates
 registrations or publishes. Owner/admin access, root/page ownership, canonical Event/session membership,
 full identity evidence, unique bindings and source CAS are required.
