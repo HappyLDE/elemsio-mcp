@@ -59,6 +59,9 @@ MCP 1.60.0 adds a dedicated workflow; generic command and dynamic-context guards
 3. Call `elems_validate_event_session_bindings`, then pass the exact validated proposal to
    `elems_configure_event_session_bindings`. Every save rechecks scope, identity and revision. Include
    all existing bindings; omission, reassignment and duplicate control/session identities are rejected.
+   If a coming-soon prototype has no native disabled attribute, explicitly supply
+   `disable_submit_ids` with inspected `submit_controls[].element_id` values. Preparation may disable
+   only those controls, never enable them. All submit controls must be disabled in the validated result.
 4. Read back `session_bindings`, Event/generated configuration and locale publication state. Saves
    regenerate the existing SQL projection and active-locale drafts, never publish. `source_saved: true`
    with `draft_status: regeneration_required` requires readback and ordinary draft regeneration; never
