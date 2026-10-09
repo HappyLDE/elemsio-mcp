@@ -39,6 +39,50 @@ available in the same inspection for exact readback.
 Other generic forms use their existing documented runtime contracts. Validate required fields,
 error/success states, keyboard behavior, and empty/submission states in the draft preview.
 
+## Native Event session controls in inactive mode
+
+MCP 1.60.0 adds a dedicated workflow; generic command and dynamic-context guards remain unchanged.
+
+1. Inspect `elems_get_event_session_bindings` with an owned Website, Page, Event and existing `form_id`.
+   A neutral registration-card `div` is a supported inactive prototype. Use `session_bindings.root_id`
+   and its whole-source `revision`. Readback includes explicit bindings, localized canonical sessions,
+   the `eventid` owner field and disabled submit state. Existing native `eventMirror` / `subitems` /
+   `item access:id|prop:name` templates are described read-only with their Event sessions.
+2. Supply the complete `controls` list with `mode: inactive`, Page/root/revision/Event/form IDs.
+   Each control names one existing `session_id`, `checked: true | false` and `labels` for every own
+   Page locale. Labels may include the canonical session time and title. IDs are never invented.
+   `operation: associate` takes existing `checkbox_id` and `label_id`: a native checkbox in a
+   wrapping label and a plain label-text leaf. Non-empty input names cannot be reassigned.
+   `operation: create` takes existing `parent_id`, sequential insertion `position`, and optional
+   `row_classes`, `input_classes`, `label_classes`; it creates only a wrapping label, native input and
+   text span. Ordinary scoped structure tools can create date headings or remove an attendance field.
+3. Call `elems_validate_event_session_bindings`, then pass the exact validated proposal to
+   `elems_configure_event_session_bindings`. Every save rechecks scope, identity and revision. Include
+   all existing bindings; omission, reassignment and duplicate control/session identities are rejected.
+4. Read back `session_bindings`, Event/generated configuration and locale publication state. Saves
+   regenerate the existing SQL projection and active-locale drafts, never publish. `source_saved: true`
+   with `draft_status: regeneration_required` requires readback and ordinary draft regeneration; never
+   replay a stale creation. Publication requires a separate authorized call.
+
+Canonical binding uses ordinary Mongo MDElements: checkbox `type=checkbox`, `name=<existing eventItem
+ID>`, `value=on`, optional `checked`, a wrapping accessible label and localized text. The tool preserves
+or adds one hidden `name=eventid`, `value=<existing Event owner ID>` field. No parallel binding table or
+configuration exists. Runtime selects sessions from the presence of submitted fields named by session
+IDs; unchecked native checkboxes submit no field. The legacy mirror generates those names dynamically.
+Explicit controls do not depend on legacy loop recompilation.
+
+Mutations accept inactive neutral form prototypes only. Form providers, actions, mixed/dynamic context,
+script/embed ownership and enabled buttons/submit inputs are rejected. Active native forms and mirror
+templates are inspection-only. The tool never sets `formType=event_registration`, changes submit state,
+rewrites personal fields/consent, touches Event/session metadata or capacities, sends email, creates
+registrations or publishes. Owner/admin access, root/page ownership, canonical Event/session membership,
+full identity evidence, unique bindings and source CAS are required.
+
+This prepares session controls, not a working registration form. Later activation needs separately
+authorized canonical handler/semantic-form configuration, `eid` owner routing and correctly named
+personal inputs. Current Runtime does not enforce capacity; Stage 3A safety must be accepted/deployed
+before relying on seat limits.
+
 ## Auth/account presets
 
 For storefront login, registration, logout, authenticated/guest branches, current-user email, order
