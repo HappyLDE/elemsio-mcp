@@ -131,7 +131,8 @@ use existing draft regeneration; do not replay creation with stale input. Read b
 generated configuration, use the ordinary page preview, and publish each explicitly authorized locale
 separately through `elems_publish_page` with freshly inspected publication state.
 
-Capacity is read-only. Current Runtime does not enforce seat limits. These tools do not activate public
+MCP Event configuration does not edit capacity. The accepted Stage 3A Runtime enforces published
+seat capacity; activation must independently verify the barrier and Runtime compatibility. These tools do not activate public
 registration, create registrations, modify historical records, or deploy Stage 3A protected admission.
 
 For inactive session checkbox preparation and legacy Event mirror inspection, use
@@ -145,3 +146,7 @@ Read `elems://docs/forms` for conversion, inactive preparation and published-sna
 `eventSessionSelector`, `event` and `eventItem` stay outside generic function/command mutation.
 Canonical Event session updates accept optional `localized_titles`, `retired` and bounded integer
 `order`; all existing identities remain in the configuration and historical registrations are retained.
+
+Native Event form preparation and explicit activation/publication use the typed MCP 1.62.0 workflow
+in [Forms and Interaction](forms-and-interaction.md). Generic function/command mutation remains
+restricted; never set raw formType or bypass its domain validation to activate registration.

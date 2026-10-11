@@ -124,8 +124,8 @@ snapshot contract before real conversions.
 
 Preparation preserves disabled submits and never sets formType=event_registration, publishes, edits
 capacity, creates registrations or sends mail. Later live registration requires separately authorized
-semantic-form/handler setup and acceptance of the relevant admission safety. Runtime still does not
-enforce seat limits. No existing website is converted as a side effect of installing this capability.
+semantic-form/handler setup and acceptance of the relevant admission safety. Accepted Stage 3A Runtime enforces published capacities under its database admission barrier;
+readiness must verify the exact barrier and compatible Runtime before activation. No existing website is converted as a side effect of installing this capability.
 
 ## Auth/account presets
 
@@ -164,3 +164,56 @@ shared/prefab, invalid, and unsafe targets remain blocked.
 JavaScript is owned by the `MdElement` that stores it. Do not mix unrelated components in one owner
 or add website-specific platform/API behavior. Prefer functions and commands for generic runtime
 capabilities. Preview and exercise meaningful interactive states after every script change.
+
+## Canonical Event registration forms (MCP 1.62.0)
+
+This is an opt-in workflow for an explicitly selected existing visual card with one native dynamic
+Event session selector. It reuses the native `form` / `event_registration` handler, participant
+storage and Stage 3A admission writer. Existing legacy forms and explicit checkboxes are unchanged.
+
+1. Inspect with `elems_get_event_registration_form`. Supply owned `website_id`, `page_id`,
+   `event_id`, `form_id` and optional locale. Inspect canonical controls, source root/revision,
+   handler/submit state, compiled locale publications and activation blockers.
+2. Validate and prepare using `elems_validate_event_registration_form` and
+   `elems_prepare_event_registration_form`. Pass the fresh whole-source `root_id`/`revision`,
+   exact participant input/label IDs, canonical field names and required flags, consent input/label
+   IDs and required flag, the submit button and its plain text submit_label_id, localized active
+   submit_labels, localized outcome messages and explicit confirmation
+   policy. Supported fields are firstname, lastname, email (mandatory), company, occupation and
+   country (optional unless explicitly required). Existing text/email inputs, labels, classes,
+   IDs and layout are preserved. Consent uses one native checkbox named input_event_consent.
+   Optional success_id/error_id target existing plain outcome elements; otherwise two minimal
+   accessible conditional status elements are appended. No arbitrary commands/DOM/functionData.
+3. Preparation sets a semantic POST form and Event association, binds native formInput commands,
+   and disables submit. It saves source/drafts only. No publication, registration, mail or capacity
+   mutation occurs. If generation fails, inspect and regenerate drafts; never blindly replay a
+   stale preparation request. Confirmation mode none requires empty subject/introduction maps;
+   required needs bounded plain localized subject/introduction text for every page-owned locale.
+4. Inspect `elems_get_event_registration_readiness`. Activation requires an exact protected Stage
+   3A barrier, compatible admitted/warm Runtime slots, complete published selector membership,
+   positive published and proposed selectable capacities, valid participant/consent/outcome
+   bindings and email routing readiness when confirmation is required. Full positive-capacity
+   sessions remain valid choices; admission rejects full selections atomically. Zero capacity
+   prevents activation. This readiness is evidence, not permission to activate a client website.
+5. Only with explicit client authorization, validate/stage active or prepared using
+   `elems_validate_event_registration_activation` / `elems_set_event_registration_activation`,
+   fresh source CAS, state and authorize_activation_change=true. This changes drafts only.
+6. Read all locale drafts, then explicitly authorize `elems_publish_event_registration` with
+   authorize_registration_publication=true, fresh source revision, and every owned locale's
+   exact draft_revision (sha256:) and expected_published state. All locale artifacts are checked
+   against canonical compilation and published atomically under Stage 3A gate/page/session locks.
+   The existing visual card and inactive selector must already be published in every locale;
+   this workflow preserves the published CSS class set and rejects new/unpublished styles.
+   Publish design changes separately while the form contract remains unchanged, then revalidate.
+   Activation prerequisites and booking floors are rechecked. Public behavior changes only after
+   that commit. Deactivation follows the same explicit draft/publication workflow. Ordinary
+   single-locale publication cannot activate/deactivate or change managed form contracts.
+
+Published opt-in contracts include field/consent validation, localized precise outcomes and form
+configuration in the existing generated page artifact. Draft SQL projections are never authority
+for public activation or participant validation. The selector token also covers the published form
+contract, so stale forms fail closed. Confirmation is optional, generic and localized; when required,
+mail is queued only after a committed new admission, never an idempotent repeat or rejected selection.
+Preparation/publication qualification creates no real participant or email. Rollback uses existing
+protected release/gate workflows and fails closed; both retained Runtime paths must understand the
+opt-in publication contract before customer preparation.
