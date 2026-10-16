@@ -161,6 +161,14 @@ Markup V1. Pass the exact `script_targets[].target_id` and `script_hash`. The se
 size, syntax without executing it, closing-script injection, and high-confidence secrets; modules,
 shared/prefab, invalid, and unsafe targets remain blocked.
 
+When an explicitly selected existing script fails syntax validation, `script_targets[]` includes a
+`syntax_diagnostic` with a stable `classification`, a sanitized `message`, and `line`/`column` only
+when the parser location is reliable. Classifications are `unexpected_end_of_input`,
+`unexpected_token`, `invalid_or_unexpected_token`, and `syntax_error`. The source and hash remain null,
+and the diagnostic never includes source text, token values, snippets, exception text, paths, or
+stacks. Other blocked scripts have `syntax_diagnostic: null`; syntax diagnostics do not make a target
+mutable or change validation behavior.
+
 JavaScript is owned by the `MdElement` that stores it. Do not mix unrelated components in one owner
 or add website-specific platform/API behavior. Prefer functions and commands for generic runtime
 capabilities. Preview and exercise meaningful interactive states after every script change.
