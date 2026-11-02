@@ -18,6 +18,7 @@ same task.
 | [forms](forms-and-interaction.md) · `elems://docs/forms` | Forms, auth/account behavior, links/buttons, embeds, or owned JavaScript | Pure styling |
 | [content](content-primitives.md) · `elems://docs/content` | Generic collections and `MdPost` records, listings, detail pages, or protected resources | Ordinary page copy |
 | [ecommerce](ecommerce.md) · `elems://docs/ecommerce` | Products, variants, pricing, carts, checkout, orders, promos, or product bindings | Brochure websites |
+| [checkout](checkout.md) · `elems://docs/checkout` | Understanding or authoring the existing Modern V2 native ecommerce checkout | Product cards or cart-only work |
 | [website creation](website-creation.md) · `elems://docs/website-creation` | Listing/selecting sites or creating a new account-owned website | Work on an already selected website |
 | `elems://docs/markup-v1` | Inserting/importing/replacing structure with canonical Markup V1 | Narrow text/class/behavior writes |
 

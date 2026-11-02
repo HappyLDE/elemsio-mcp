@@ -98,6 +98,13 @@ export const authoringDocs = [
     file: 'docs/ecommerce.md',
   },
   {
+    name: 'elems-docs-checkout',
+    uri: 'elems://docs/checkout',
+    title: 'ELEMS Modern V2 Native Ecommerce Checkout',
+    description: 'Confirmed Runtime checkout path, cart session, locale routes, required hooks, and current MCP authoring limits.',
+    file: 'docs/checkout.md',
+  },
+  {
     name: 'elems-docs-website-creation',
     uri: 'elems://docs/website-creation',
     title: 'ELEMS Website Selection and Creation',
