@@ -4,6 +4,12 @@ Use tool schemas directly for simple operations. If ELEMS-specific knowledge is 
 resources below; do not read all of them by default or reload documents already understood in the
 same task.
 
+> **ELEMS pages are modular compositions of MdElements.** Checkout, forms, carts, and other
+> workflows use existing element structure, Runtime functions, providers, commands, bindings,
+> conditions, forms, and owned JavaScript. Read [checkout composition](checkout.md) before assuming a
+> workflow needs a new page-specific component. A missing MCP authoring operation alone does not
+> establish a missing platform capability.
+
 | Resource | Load when | Do not load merely for |
 | --- | --- | --- |
 | [elements](elements.md) · `elems://docs/elements` | Understanding trees, `mdid`, `domType`, content, attributes, targets, or safe mutation | A tool schema already fully describes a one-field edit |
@@ -18,7 +24,7 @@ same task.
 | [forms](forms-and-interaction.md) · `elems://docs/forms` | Forms, auth/account behavior, links/buttons, embeds, or owned JavaScript | Pure styling |
 | [content](content-primitives.md) · `elems://docs/content` | Generic collections and `MdPost` records, listings, detail pages, or protected resources | Ordinary page copy |
 | [ecommerce](ecommerce.md) · `elems://docs/ecommerce` | Products, variants, pricing, carts, checkout, orders, promos, or product bindings | Brochure websites |
-| [checkout](checkout.md) · `elems://docs/checkout` | Understanding or authoring the existing Modern V2 native ecommerce checkout | Product cards or cart-only work |
+| [checkout composition](checkout.md) · `elems://docs/checkout` | Understanding how generic MdElements and existing Runtime capabilities compose checkout | Product cards or cart-only work |
 | [website creation](website-creation.md) · `elems://docs/website-creation` | Listing/selecting sites or creating a new account-owned website | Work on an already selected website |
 | `elems://docs/markup-v1` | Inserting/importing/replacing structure with canonical Markup V1 | Narrow text/class/behavior writes |
 
@@ -28,10 +34,13 @@ Common routes:
 - One page-section redesign: `elements`, `styling`, `pages`; add `media` only if assets change.
 - Shared header/footer: `elements`, `styling`, `templates`.
 - Dynamic locale selector: `elements`, `functions`, `commands`, `localization`, and `templates` when shared.
+- Checkout or another complex page workflow: `pages`, `elements`, `functions`, `commands`, `forms`,
+  `ecommerce`, and `checkout`; inspect working references read-only.
 - New website: `website-creation`, `pages`, `elements`, `styling`; add capability topics only as needed.
 
-Expand documentation scope only when the task expands or a current uncertainty requires it. If the
-required capability is absent from tools and these resources, stop and report the limitation.
+Expand documentation scope only when the task expands or a current uncertainty requires it. If no
+safe MCP authoring operation is exposed, report that authoring gap; do not infer that the MdElement
+model or Runtime lacks the capability until you inspect them.
 
 Website favicon/site-icon identity: read `elems_get_context.favicon`, then use
 `elems_set_website_favicon` for existing Media set/replace or null clear. Load

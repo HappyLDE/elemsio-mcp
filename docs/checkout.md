@@ -1,146 +1,113 @@
-# ELEMS Modern V2 Native Ecommerce Checkout
+# ELEMS Checkout Composition
 
-This document records the source-backed investigation of the public storefront checkout used by
-Ringador. It distinguishes observed behavior from the page details that remain inaccessible through
-MCP. The Ringador inspection is evidence about that existing site, not a promise that the same page
-can already be reproduced safely on another website.
+> **ELEMS pages are modular compositions of MdElements.** Checkout is an ordinary page assembled
+> from generic elements, Runtime functions, commands, form behavior, and owned JavaScript. It is not a
+> page-specific component or a special page type.
 
-## Confirmed behavior
+This guide uses the public storefront checkout and the read-only inspection of Ringador website
+`167`, page `3043`, as a practical example. For the page and element model, see
+[pages](pages-and-drafts.md) and [elements](elements.md); for the shared behavior model, see
+[functions](functions.md), [commands](commands-runtime.md), and [forms](forms-and-interaction.md).
 
-### It is a normal Modern V2 page
+## The page and element model
 
-Ringador (website `167`) has a published page `3043` at `/checkout`, with effective template `268`.
-The page is an ordinary `page` with `system_page_type` unset. Its route is not a reserved checkout
-route: Runtime sends unmatched GET and POST paths to `WebsitesController.index`, resolves the
-website/domain and locale, then resolves the path slug against the website's pages and its
-translation for the selected locale.
+Ringador's `/checkout` is a normal Modern V2 `page` with no `system_page_type`, using effective
+template `268`. Its read-only source-tree inspection returned 310 nodes. The tree has a `div` root;
+its main cart owner is another `div` with `functionType="cart"` and page-owned JavaScript. The
+inspector describes current source; it does not certify that source as an exact snapshot of the
+published page.
 
-Source: `elemsio-runtime/start/routes.ts` (`Route.get('*')`, `Route.post('*')`);
-`elemsio-runtime/app/Controllers/Http/WebsitesController.ts` (`index`).
+An MdElement independently holds its DOM type and structure, localized content and attributes,
+optional `functionType`/`functionData`, commands, and owned JavaScript. Commands provide runtime
+bindings, loops, and conditions within the nearest provider scope. Each element can also carry its
+own classes and responsive layout. `functionType` does not choose the HTML tag: for example,
+`functionType="cart"` on a `div` leaves it a `div`, and a native `form` remains separate from any
+function attached to it.
 
-For a Modern V2 page, `index` loads the effective template and the published page/template element
-functions, builds their runtime data contexts, and renders the published page and template content.
-Both page-owned and template-owned functions are supported by this renderer; the source inspection
-does not establish which owner contains Ringador's checkout form.
+The public MCP authoring surface validates and exposes only specific operations and allowlists. A
+missing MCP authoring operation is not proof that the MdElement model or Runtime lacks the capability.
+Report the exact authoring boundary after inspecting the existing model, Runtime behavior, and tools.
 
-Source: `elemsio-runtime/app/Controllers/Http/WebsitesController.ts` (`index`, V2 rendering and
-`getRuntimeElementFunctions` call around the page/template function query).
+## Checkout assembled from existing capabilities
 
-### Checkout uses existing ecommerce functions
+The exact elements, scopes, and state depend on the page. A checkout can compose the following
+generic capabilities without introducing a checkout-specific component:
 
-The Runtime recognizes these generic function types in the V2 renderer:
+| Checkout need | Existing composition |
+| --- | --- |
+| Cart items and totals | A `cart` provider owns cart context and existing cart actions. Child MdElements render items, quantities, subtotal, shipping, discounts, and total through cart commands. |
+| Login and registration | Existing auth/account form presets configure native login/register forms. `if:loggedIn` and `unless:loggedIn` can show the authenticated or guest branch. |
+| Saved addresses | A `shippingAddresses` provider supplies the customer's saved-address loop; `shippingAddressItem*` bindings render each address, and `shippingAddressItemId` binds its ID to the selection control. |
+| Current shipping address and countries | `shippingAddress` exposes current address context; `shippingCountries` supplies allowed country options. |
+| Shipping rates | The cart's `cartShippingRates` loop renders available rates and selected state. A page-owned script or existing control submits the cart's `set_shipping_zone_rate` action. |
+| Payment methods | `paymentMethods` or `checkoutPaymentMethods` supplies available methods. Conditions and descendant bindings render the supported Stripe or PayPal controls. |
+| Conditional visibility | Commands such as `if:cartHasItems`, `unless:loggedIn`, `if:paymentMethodIsStripe`, and `if:paymentMethodIsPaypal` gate the matching elements. `urlParams` can expose route-query state where supported. |
 
-- `cart` reads and hydrates the website's current cart and payment configuration;
-- `shippingCountries` supplies the country options used by checkout shipping UI;
-- `paymentMethods` and `checkoutPaymentMethods` supply the configured checkout payment methods.
+For Ringador's inspected checkout, the guest-details form is a native HTML form with no
+`functionType`. It is under the cart-owned checkout region, uses `unless:loggedIn`, and submits
+`cart_action=set_guest_checkout_details` with the cart element's `eid`. The cart provider dispatches
+the existing Runtime action. Saved-address selection submits `set_shipping_address` with
+`shipping_address_id`; the shipping-rate control uses `set_shipping_zone_rate`. These are existing
+Runtime actions, not new form types or per-site endpoints.
 
-The Ringador template inspection confirmed a template-owned `cart` function on its “Cart section”.
-The inspected “Checkout btn” is a regular anchor to `{{ base_url }}/checkout`, not a checkout
-function. No dedicated `checkout` function type or checkout preset is supported by the inspected
-Runtime and MCP function allowlists.
+Storefront payment setup also uses existing cart actions: Stripe creates a payment intent and follows
+the existing confirmation/finalization flow; PayPal creates an order and captures it after provider
+approval. Runtime remains authoritative for cart, address, shipping, and payment validation.
 
-Source: `elemsio-runtime/app/Controllers/Http/WebsitesController.ts` (`index`, V2 function switch);
-`elemsio-mcp-public/docs/functions.md` (public function allowlist).
+The Runtime recognizes generic function types including `cart`, `shippingAddress`,
+`shippingAddresses`, `shippingCountries`, `paymentMethods`, and `checkoutPaymentMethods`. It also
+provides shared storefront checkout scripts when their supported page hooks are present. Page-owned
+JavaScript may handle page-specific interaction using the existing Runtime contract; it does not
+create a new provider or endpoint. Script source belongs to its owning MdElement and is separate from
+that element's commands and `functionData`.
 
-### Runtime supplies shared checkout JavaScript and server actions
+The shared payment script recognizes markers including `checkout-stripe-payment-element`,
+`create_stripe_payment_intent`, `shipping-zone-rate-options`, and `checkout-discount-code`. It also
+queries regions such as `.checkout-payment-section`, `.checkout-stripe-start-btn`,
+`.checkout-dynamic-shipping-section`, `.checkout-paypal-wrapper`, and `#checkout-paypal-buttons`.
+These are Runtime integration hooks, not a page-specific component or a complete required page
+schema; not every checkout needs every hook.
 
-`appendStorefrontRuntimeScripts` calls `appendCheckoutPaymentsRuntimeScript`. The shared checkout
-script activates when rendered content contains one of the recognized hooks below; it then manages
-checkout UI state and sends actions to Runtime. This is generic storefront support, not evidence of a
-page-specific script on page 3043.
+## Authoring workflow
 
-Recognized activation markers include:
+1. Inspect the live MCP tool schemas, focused authoring resources, current page tree, function and
+   command allowlists, and Runtime actions relevant to the requested behavior.
+2. Inspect an existing working page as a **read-only** reference. Use it to understand element
+   structure, scopes, conditions, and existing behavior; do not modify the reference.
+3. Reuse existing generic MdElements, providers, commands, native form behavior, and Runtime actions.
+   Compose the smallest required page-owned structure and behavior.
+4. Use the supported MCP operation for each change. Read back the source, then validate draft
+   preview states, locales, and responsive layout before publication.
+5. Publish only when requested, then verify the live page.
 
-- `checkout-stripe-payment-element`
-- `create_stripe_payment_intent`
-- `shipping-zone-rate-options`
-- `checkout-discount-code`
+> **Do not request new platform components, endpoints, functionTypes or Core/API/MCP changes before
+> verifying that the requested functionality cannot be composed using existing MdElement
+> capabilities.**
 
-The script also looks for checkout regions such as `.checkout-payment-section`,
-`.checkout-stripe-start-btn`, `.checkout-dynamic-shipping-section`, `.checkout-paypal-wrapper`,
-`#checkout-paypal-buttons`, and `.checkout-dev-payment-wrapper`. Guest/client checkout roots and
-customer, shipping, billing, payment, and shipping-rate controls are queried by the shared code.
-These are Runtime integration hooks; this list is not a complete required page schema, and the source
-does not establish that every hook is required on every checkout.
+If the model and Runtime support a behavior but the public MCP does not expose a safe authoring
+operation, describe the missing MCP operation precisely. Do not infer that the platform itself needs
+a new component, and do not work around the public authoring boundary with direct API or database
+edits.
 
-POST requests are routed through the same generic page handler. Runtime uses the submitted element
-identifier (`eid`) to find the owning function and dispatches `cart_action` for a `cart` provider.
-Existing handlers include `set_guest_checkout_details`, `get_checkout_cart`,
-`set_shipping_zone_rate`, and payment actions such as `create_stripe_payment_intent` and
-`create_paypal_order`/`capture_paypal_order`. Server-side cart, shipping, and payment checks remain
-authoritative.
+## Runtime route and action context
 
-Source: `elemsio-runtime/app/Controllers/Http/WebsitesController.ts`
-(`appendCheckoutPaymentsRuntimeScript`, `appendStorefrontRuntimeScripts`, `index` POST handling and
-the `cart` action switch).
-
-### Cart and locale context are preserved by Runtime
-
-For a guest, checkout reads the cart identifier from the existing Runtime session and selects a
-guest cart belonging to that website. For a signed-in client, it first checks the session cart for
-that client, then falls back to a cart scoped to the current website. The checkout route does not
-itself create a replacement cart. The same website session continues across locale-prefixed routes.
+Modern V2 pages use the normal website page route. Runtime resolves the website, locale, page, and
+effective template, then builds the page and template element-function contexts. The current website
+session retains its cart across checkout rendering and locale-prefixed routes.
 
 Runtime derives `base_url` from the selected locale and website/domain defaults. Ringador's inspected
-template link uses `{{ base_url }}/checkout`; this keeps the checkout path in the current locale
-context.
+checkout link uses `{{ base_url }}/checkout` to keep the path in the current locale context. MCP
+supports native Page-ID destinations for menu items; ordinary page/template anchors currently use
+localized `href` editing. See [menu authoring](menus.md) for that distinction. Do not infer a native
+page-reference binding for ordinary anchors from the Ringador example.
 
-Source: `elemsio-runtime/app/Controllers/Http/WebsitesController.ts`
-(`getActiveCheckoutCartV2`, `index` locale/base URL construction and V2 cart rendering).
+Storefront POST actions use the owning element ID (`eid`) to find the Runtime function and dispatch
+the submitted `cart_action`. Existing cart actions include `set_guest_checkout_details`,
+`set_shipping_address`, `set_shipping_zone_rate`, `create_stripe_payment_intent`,
+`create_paypal_order`, and `capture_paypal_order`. Server-side ownership and state checks remain
+authoritative.
 
-## Unverified details
-
-- `elems_get_page` confirms page 3043 exists and is published, but `elems_get_page_elements` returns
-  MCP `PAGE_NOT_FOUND`. The template can be inspected; the page's exact V2 element tree cannot.
-- Therefore the exact checkout element ownership, markup tree, form shape, and any page-specific
-  JavaScript on page 3043 remain unverified.
-- The API derives a V2 root ID from the page row, then its content-context endpoint requires a
-  document with that exact ID and `type: "page"`. The endpoint returns `page_content_not_available`
-  when this predicate fails. The underlying cause for page 3043—missing document, mismatched ID, or
-  wrong document type—has not been confirmed from source inspection alone.
-- `PAGE_NOT_FOUND` is MCP's normalized error for page-content errors. It does not mean the published
-  Page record or rendered `/checkout` route is absent.
-- No source evidence justifies creating a new checkout `functionType` or a checkout preset.
-
-Source: `elemsio-api/app/Services/BaseWebsiteContextResolver.ts` (`pageIdentity`);
-`elemsio-api/app/Services/PageContentContextHttpEndpoint.ts` (`resolve`, `isExactPageRoot`);
-`elemsio-api/app/Services/Mcp/ElemsMcpApplication.ts` (`getPageElements`, `normalizedError`).
-
-## Known MCP limitations
-
-MCP can create a non-root Modern V2 draft page using an existing website-owned template, initialize
-active locales, insert/import supported static structure, and update allowlisted element behaviors
-and commands with compare-and-set values. Page insertion/import is normally static-only; behavior is
-configured through inspected canonical targets. The published checkout is never created by the page
-creation operation alone.
-
-The current MCP content inspection path cannot read Ringador page 3043's V2 root, so it cannot
-provide a verified tree to reuse. Its error normalization maps `page_content_not_available` to
-`PAGE_NOT_FOUND`, obscuring the difference between an absent Page and unavailable content.
-
-MCP supports native Page-ID destinations for menu items. Ordinary page/template anchors have
-localized href editing, but no structured Page-ID destination that Runtime can resolve in the
-current locale. Ringador's `{{ base_url }}/checkout` anchor is evidence of its existing link, not a
-reusable native page-reference operation in MCP. Do not substitute hardcoded locale URLs or claim
-that the checkout link can already be safely connected across locales.
-
-Sources: `elemsio-mcp-public/docs/pages-and-drafts.md`, `docs/functions.md`, `docs/commands-runtime.md`,
-and `docs/menus.md`; `elemsio-api/app/Services/Mcp/ElemsMcpApplication.ts` (`getPageElements`,
-`normalizedError`).
-
-## Recommended next steps
-
-1. Make the canonical V2 source for page 3043 inspectable through the supported MCP content path, or
-   expose a safe read-only inspection of its published V2 structure. Preserve the distinction
-   between a missing Page and unavailable page content in the returned MCP error.
-2. Once readable, verify the exact checkout tree, behavior ownership, form/action bindings, and
-   whether the page has its own scripts. Document only what that readback confirms.
-3. Add a reusable page-reference binding for ordinary anchors, resolved against the current locale,
-   following the existing native Page destination model used by menus.
-4. Only then assess whether existing static structure and native function operations can reproduce
-   that verified composition on another website. Preview empty and populated carts, shipping and
-   payment states, and each active locale before treating a reproduction as safe.
-
-Until those checks are possible, do not claim that Pretzel King's checkout can already be reproduced
-safely. The existing native cart is confirmed, but the checkout page structure and locale-aware
-drawer-to-page binding are not.
+Sources: `elemsio-runtime/start/routes.ts` and
+`elemsio-runtime/app/Controllers/Http/WebsitesController.ts` (V2 rendering, locale context,
+checkout scripts and cart action dispatch); read-only MCP source-tree inspection of Ringador website
+`167`, page `3043`, locale `fr`, 310 nodes (2026-11-03).

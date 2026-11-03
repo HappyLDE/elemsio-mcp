@@ -45,6 +45,10 @@ pass the validated string unchanged to the mutation tool.
 
 ## Stop condition
 
-If the requested result cannot be expressed by the exposed ELEMS MCP tools and documented
-capabilities, stop and report the missing platform capability. Do not bypass ownership, use an
-authenticated editor as a fallback, fabricate an MCP operation, or modify private platform code.
+Before reporting a platform gap, inspect the existing MdElement model, Runtime behavior, and public
+MCP authoring operations. A missing MCP operation alone does not establish a missing ELEMS platform
+capability. If the behavior composes from existing platform capabilities but no safe MCP authoring
+operation is exposed, report that precise authoring gap. Only after verifying the behavior is absent
+from the platform should you stop and report the missing platform capability. Do not bypass
+ownership, use an authenticated editor as a fallback, fabricate an MCP operation, or modify private
+platform code.

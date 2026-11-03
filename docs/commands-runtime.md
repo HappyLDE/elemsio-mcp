@@ -3,6 +3,10 @@
 Load this resource for runtime values, loops, or conditional rendering. Commands are allowlisted
 metadata compiled by ELEMS; they are not arbitrary Liquid or JavaScript.
 
+Commands are one part of the modular MdElement composition: a provider establishes scope, and its
+descendant elements use commands for values, loops, and conditions. See [checkout composition](checkout.md)
+for a working example of cart, address, shipping, and payment scopes.
+
 ## Representation
 
 An element's `commands` is a flat string map. In behavior updates the keys are command names such as

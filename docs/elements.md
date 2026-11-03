@@ -3,6 +3,12 @@
 Load this resource for ELEMS tree structure, element fields, inspection metadata, and mutation target
 selection. For structural syntax and limits, also load `elems://docs/markup-v1`.
 
+> **ELEMS pages are modular compositions of MdElements.** Each element owns its DOM structure and can
+> independently carry localized content, attributes, function behavior, commands, conditions, loops,
+> forms, JavaScript, and styling where supported. See [checkout composition](checkout.md) for a
+> practical example. A specific MCP operation may be narrower than the generic MdElement/Runtime
+> capability; inspect both before concluding that the platform needs a new component.
+
 ## Element model
 
 A modern page or template is a rooted tree. Each element has a parent (except the root), ordered

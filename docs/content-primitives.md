@@ -40,5 +40,6 @@ multipart `ResourceAsset` lifecycle and are never public Media Library assets. S
 short-lived authorization values and must not be logged or persisted.
 
 Do not request a domain-specific core model when these generic primitives express the requirement.
-If required querying, relationships, field types, or behavior are not exposed, stop and report the
-missing platform capability instead of fabricating a schema or runtime function.
+If required querying, relationships, field types, or behavior are not exposed by MCP, report the
+specific authoring boundary instead of fabricating a schema or runtime function. Verify the
+underlying MdElement model and Runtime before describing it as a missing platform capability.

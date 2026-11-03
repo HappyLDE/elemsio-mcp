@@ -3,6 +3,11 @@
 Load this resource for forms, links/buttons, auth/account behavior, passive embeds, or existing owned
 JavaScript.
 
+> **ELEMS pages are modular compositions of MdElements.** Forms are element structures with
+> separately configured behavior; checkout can combine native login/register forms, guest details,
+> saved-address controls, and existing cart actions. See [checkout composition](checkout.md) and
+> keep the DOM type, form behavior, and Runtime provider roles distinct.
+
 ## Links, buttons, and forms
 
 Use semantic `a` for navigation and `button` for actions. Link mutation is limited to inspected
@@ -36,8 +41,12 @@ provider type, recipient, each field's native control type, binding and required
 explicit submit type, and success/error bindings. Element attributes and behavior commands remain
 available in the same inspection for exact readback.
 
-Other generic forms use their existing documented runtime contracts. Validate required fields,
-error/success states, keyboard behavior, and empty/submission states in the draft preview.
+`functionType="form"` is independent from `domType="form"`, which describes native HTML structure
+when an authoring operation permits it. Some native forms are handled by an ancestor provider and
+owned JavaScript. For example, checkout guest details can use an existing cart action without
+`functionType="form"`. Other generic forms use their existing documented Runtime contracts. Validate
+required fields, error/success states, keyboard behavior, and empty/submission states in the draft
+preview.
 
 ## Native Event session controls in inactive mode
 

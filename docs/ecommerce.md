@@ -25,6 +25,11 @@ for presentation.
 
 ## Runtime composition
 
+Checkout is an ordinary page assembled from generic MdElements and existing Runtime capabilities; it
+is not a dedicated checkout component. See [checkout composition](checkout.md) for the provider,
+form, condition, and action example, and [the element model](elements.md) for how structure and
+behavior remain separate.
+
 Current generic ecommerce providers include `productsCollection`, `productSearch`, `product`, `cart`,
 `shippingCountries`, `shippingAddress`, `shippingAddresses`, `paymentMethods`, and
 `checkoutPaymentMethods`. Orders use `clientOrders` and `clientOrderDetail`; the bounded auth/account
@@ -71,8 +76,9 @@ existing OrderItem snapshots or historical `ResourceAccessGrant` rows. Render pu
 with an inspected posts function using `access_mode="granted"`.
 
 Ownership remains website/entity scoped throughout. If a required catalog, checkout, payment, order,
-or variant operation is not exposed, report that limitation; do not use admin procedures or private
-provider details.
+or variant authoring operation is not exposed, report that MCP boundary; do not use admin procedures
+or private provider details. Do not infer a Runtime or platform gap from a missing MCP operation
+alone.
 
 ## Internal TEST resource checkout
 

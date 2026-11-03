@@ -3,6 +3,12 @@
 Load this resource only when an element needs or already has runtime-provided data. Static content and
 layout do not need a function.
 
+> **ELEMS pages are modular compositions of MdElements.** `functionType` and `functionData` provide
+> generic Runtime behavior on individual elements; commands bind that provider's values into the
+> element tree. They do not select a page-specific component. See [checkout composition](checkout.md)
+> for cart, address, shipping, and payment examples. Check the MCP authoring boundary separately from
+> the platform model before requesting a new function type.
+
 ## Model and mutation boundary
 
 `functionType` selects one generic ELEMS runtime provider. `functionData` is its flat string-to-string
@@ -82,8 +88,9 @@ The numeric ID is illustrative; use an ID returned by the same website's content
 loop and value bindings are documented in `elems://docs/commands`.
 
 Generic capabilities belong in generic primitives. A site-specific requirement is not a reason to
-invent a new core function type. If the allowlist and tools cannot express it, stop and report the
-platform limitation.
+invent a new core function type. If the public allowlist or tools do not expose the needed operation,
+report that exact MCP authoring boundary. A missing operation alone does not prove a platform
+limitation; inspect the MdElement model and Runtime behavior before making that claim.
 
 An empty `cart` provider with `presentation="resource_checkout"` and a same-website positive
 `productId` renders the generic resource-product purchase surface. Custom children/content/embeds

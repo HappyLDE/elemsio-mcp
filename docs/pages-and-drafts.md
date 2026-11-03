@@ -3,6 +3,12 @@
 Load this resource for page creation, page-owned content, draft lifecycle, preview, publication, and
 structural mutation safety.
 
+> **ELEMS pages are modular compositions of MdElements.** A page workflow such as checkout is built
+> by composing ordinary structure with existing Runtime functions, commands, form behavior, and
+> owned JavaScript. See [the checkout composition example](checkout.md) before treating a workflow as
+> a separate page-specific component. The public MCP authoring surface may expose fewer operations
+> than the underlying MdElement model and Runtime support.
+
 Existing V2 template assignments use `elems_assign_page_template`. Read the current page and pass
 its exact assignment token, such as `ta:4`. Assignment requires a same-website published template
 with current CSS coverage for the page. It immediately changes the template used by live composition
