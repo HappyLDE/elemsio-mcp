@@ -14,6 +14,11 @@ Generic forms use `functionType="form"`, an allowlisted `formType`, and canonica
 bindings. A provider alone does not create a working form: contact submissions require a semantic
 `<form>` root with `method="POST"` and a real submit control. A form action is runtime behavior, not
 arbitrary endpoint configuration.
+A guest form inside an existing cart provider may use the cart-backed native form contract without
+its own `functionType="form"`. Descendant `formInput` bindings must use `name:<field>|prop:value`
+with a matching `name="input_<field>"` on an input, select, or textarea. `formItemIsChecked` must
+bind a matching checkbox or radio. Nested forms, HTML `action` endpoints, password bindings, and
+commands outside the shared Runtime allowlist are rejected.
 
 For a native contact form on a normal Page, read `elems://docs/markup-v1`, then call
 `elems_validate_markup` and `elems_import_markup` with `behavior_profile="contact_form"`, passing the
@@ -165,6 +170,21 @@ new raw `<script>` element or Markup V1 script markup. The server checks ownersh
 without executing it, closing-script injection, and high-confidence secrets; modules, shared/prefab,
 invalid, and unsafe targets remain blocked.
 
+When an explicitly selected existing script is safe and secret-free but fails syntax validation,
+`script_targets[]` still returns it with its current source and hash and `mutation_eligible: true`,
+plus a `syntax_diagnostic` with a stable `classification`, a sanitized `message`, and `line`/`column`
+only when the parser location is reliable. Classifications are `unexpected_end_of_input`,
+`unexpected_token`, `invalid_or_unexpected_token`, and `syntax_error`. The diagnostic never includes
+parser excerpts, token values, exception text, paths, or stacks. Repair the source through
+`elems_update_element_javascript` using that exact fresh hash. Valid scripts have
+`syntax_diagnostic: null`; unsafe, secret-bearing, shared, prefab, and module sources remain ineligible.
+
+For a cart-owned script, the setter also accepts exactly `{{ elementFunction_cart._id }}` and
+`{{ base_path }}`, plus the existing standalone `window.cart = {{ elementFunction_cart.cart | json }}`
+line. These expressions are replaced with inert JavaScript identifiers for syntax validation. Other
+Liquid expressions remain rejected; the cart expressions require the script owner to be a cart
+function.
+
 The element property is rendered by ELEMS as the element-owned `<script>` output. Raw `<script>` markup
 being forbidden by Markup V1/HTML Embed is a separate concern.
 
@@ -210,7 +230,7 @@ storage and Stage 3A admission writer. Existing legacy forms and explicit checkb
    exact draft_revision (sha256:) and expected_published state. All locale artifacts are checked
    against canonical compilation and published atomically under Stage 3A gate/page/session locks.
    The existing visual card and inactive selector must already be published in every locale;
-   this workflow preserves the published CSS class set and rejects new/unpublished styles.
+   when prepared drafts add classes, it promotes the generated immutable template CSS artifact in the same transaction as all locale page artifacts; template HTML, functions and revisions are not published.
    Publish design changes separately while the form contract remains unchanged, then revalidate.
    Activation prerequisites and booking floors are rechecked. Public behavior changes only after
    that commit. Deactivation follows the same explicit draft/publication workflow. Ordinary
