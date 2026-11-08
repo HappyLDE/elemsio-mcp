@@ -180,7 +180,7 @@ is not guessed. `payment_success_evaluated=false` and `entitlement_evaluated=fal
 
 ### Concurrency and commerce isolation
 
-Every authoring operation compares the complete opaque authored state under canonical MySQL locks.
+Every authoring operation compares the complete opaque authored state under canonical record locks.
 Do not construct the hash. A stale conflicting write returns CONFLICT; read again before deciding
 what to change. A same-value retry returns `already_current` without rewriting newer unrelated fields.
 Concurrent conflicting edits serialize. Pricing uses its separate exact expected pair and supports

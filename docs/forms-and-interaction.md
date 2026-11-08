@@ -68,11 +68,11 @@ MCP 1.60.0 adds a dedicated workflow; generic command and dynamic-context guards
    `disable_submit_ids` with inspected `submit_controls[].element_id` values. Preparation may disable
    only those controls, never enable them. All submit controls must be disabled in the validated result.
 4. Read back `session_bindings`, Event/generated configuration and locale publication state. Saves
-   regenerate the existing SQL projection and active-locale drafts, never publish. `source_saved: true`
+   regenerate the existing generated configuration and active-locale drafts, never publish. `source_saved: true`
    with `draft_status: regeneration_required` requires readback and ordinary draft regeneration; never
    replay a stale creation. Publication requires a separate authorized call.
 
-Canonical binding uses ordinary Mongo MDElements: checkbox `type=checkbox`, `name=<existing eventItem
+Canonical binding uses ordinary `MdElement` page elements: checkbox `type=checkbox`, `name=<existing eventItem
 ID>`, `value=on`, optional `checked`, a wrapping accessible label and localized text. The tool preserves
 or adds one hidden `name=eventid`, `value=<existing Event owner ID>` field. No parallel binding table or
 configuration exists. Runtime selects sessions from the presence of submitted fields named by session
@@ -88,8 +88,8 @@ full identity evidence, unique bindings and source CAS are required.
 
 This prepares session controls, not a working registration form. Later activation needs separately
 authorized canonical handler/semantic-form configuration, `eid` owner routing and correctly named
-personal inputs. Current Runtime does not enforce capacity; Stage 3A safety must be accepted/deployed
-before relying on seat limits.
+personal inputs. Do not rely on seat limits until `elems_get_event_registration_readiness` verifies the
+exact protected admission barrier and a compatible Runtime.
 
 ## Dynamic native Event session selector (MCP 1.61.0)
 
@@ -123,13 +123,13 @@ raw functionData, commands, new registration mechanism or Runtime mirror loop is
 A scope-validated generated snapshot accompanies each compiled page artifact. Public rendering and
 registration validation use the last published page/locale snapshot; preview rendering uses the draft.
 Hidden eventchoices revision tokens reject stale selections, wrong Event owners and retired/unknown
-session IDs before registration side effects. Draft SQL projections cannot activate the form. Legacy
+session IDs before registration side effects. Draft generated configuration cannot activate the form. Legacy
 unconverted pages retain their previous behavior. Both retained Runtime releases must understand the
 snapshot contract before real conversions.
 
 Preparation preserves disabled submits and never sets formType=event_registration, publishes, edits
 capacity, creates registrations or sends mail. Later live registration requires separately authorized
-semantic-form/handler setup and acceptance of the relevant admission safety. Accepted Stage 3A Runtime enforces published capacities under its database admission barrier;
+semantic-form/handler setup and acceptance of the relevant admission safety. A Runtime with the protected admission barrier enforces published capacities atomically;
 readiness must verify the exact barrier and compatible Runtime before activation. No existing website is converted as a side effect of installing this capability.
 
 ## Auth/account presets
@@ -196,7 +196,7 @@ capabilities. Preview and exercise meaningful interactive states after every scr
 
 This is an opt-in workflow for an explicitly selected existing visual card with one native dynamic
 Event session selector. It reuses the native `form` / `event_registration` handler, participant
-storage and Stage 3A admission writer. Existing legacy forms and explicit checkboxes are unchanged.
+storage and protected admission writer. Existing legacy forms and explicit checkboxes are unchanged.
 
 1. Inspect with `elems_get_event_registration_form`. Supply owned `website_id`, `page_id`,
    `event_id`, `form_id` and optional locale. Inspect canonical controls, source root/revision,
@@ -216,8 +216,8 @@ storage and Stage 3A admission writer. Existing legacy forms and explicit checkb
    mutation occurs. If generation fails, inspect and regenerate drafts; never blindly replay a
    stale preparation request. Confirmation mode none requires empty subject/introduction maps;
    required needs bounded plain localized subject/introduction text for every page-owned locale.
-4. Inspect `elems_get_event_registration_readiness`. Activation requires an exact protected Stage
-   3A barrier, compatible admitted/warm Runtime slots, complete published selector membership,
+4. Inspect `elems_get_event_registration_readiness`. Activation requires an exact protected
+   admission barrier, compatible admitted/warm Runtime slots, complete published selector membership,
    positive published and proposed selectable capacities, valid participant/consent/outcome
    bindings and email routing readiness when confirmation is required. Full positive-capacity
    sessions remain valid choices; admission rejects full selections atomically. Zero capacity
@@ -228,7 +228,7 @@ storage and Stage 3A admission writer. Existing legacy forms and explicit checkb
 6. Read all locale drafts, then explicitly authorize `elems_publish_event_registration` with
    authorize_registration_publication=true, fresh source revision, and every owned locale's
    exact draft_revision (sha256:) and expected_published state. All locale artifacts are checked
-   against canonical compilation and published atomically under Stage 3A gate/page/session locks.
+   against canonical compilation and published atomically under protected admission gate, page and session locks.
    The existing visual card and inactive selector must already be published in every locale;
    when prepared drafts add classes, it promotes the generated immutable template CSS artifact in the same transaction as all locale page artifacts; template HTML, functions and revisions are not published.
    Publish design changes separately while the form contract remains unchanged, then revalidate.
@@ -237,7 +237,7 @@ storage and Stage 3A admission writer. Existing legacy forms and explicit checkb
    single-locale publication cannot activate/deactivate or change managed form contracts.
 
 Published opt-in contracts include field/consent validation, localized precise outcomes and form
-configuration in the existing generated page artifact. Draft SQL projections are never authority
+configuration in the existing generated page artifact. Draft generated configuration is never authority
 for public activation or participant validation. The selector token also covers the published form
 contract, so stale forms fail closed. Confirmation is optional, generic and localized; when required,
 mail is queued only after a committed new admission, never an idempotent repeat or rejected selection.

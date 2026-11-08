@@ -101,8 +101,8 @@ updates, imports and template insertion; use the typed Event workflow:
 2. `elems_get_event_configuration` inspects an owned Modern page and optional Event. Before creation,
    omit `event_id` to discover eligible existing containers, descendant cards and existing native
    registration forms. Read `configuration.root_id` and the opaque whole-source `revision` unchanged.
-   With `event_id`, read current sessions, marked metadata, canonical Mongo configuration, generated
-   SQL configuration, and per-locale draft/published state. Generated configuration can be refreshed
+   With `event_id`, read current sessions, marked metadata, canonical source configuration, generated
+   configuration, and per-locale draft/published state. Generated configuration can be refreshed
    before publication and is not a published snapshot. No participant records are exposed.
 3. `elems_validate_event_configuration` validates a complete proposed configuration through the same
    domain planner and historical identity checks as saving, without writes or generation. Validation
@@ -118,9 +118,9 @@ updates, imports and template insertion; use the typed Event workflow:
 
 All four operations require website owner/admin authorization. The API rechecks website/entity/page,
 Modern template/root ownership, globally aliased roots, target eligibility, source deletion, duplicate
-and nested identities, historical registration references, and full-source concurrency. Mongo is the
-only authoring source; the existing compiler regenerates `element_functions` and all active-locale
-drafts. Existing IDs, children, classes, styling and unrelated locale content are preserved. Missing
+and nested identities, historical registration references, and full-source concurrency. The canonical page element
+source is the only authoring source; the existing compiler regenerates the generated function configuration and all
+active-locale drafts. Existing IDs, children, classes, styling and unrelated locale content are preserved. Missing
 metadata is hidden. Existing marked title/date edits are deliberate: inspect `updates_visible_content`
 before editing them. Registration form association preserves existing inputs and submission behavior;
 it does not create, repair or activate a public form. Keep visual registration prototypes unchanged.
@@ -131,13 +131,13 @@ use existing draft regeneration; do not replay creation with stale input. Read b
 generated configuration, use the ordinary page preview, and publish each explicitly authorized locale
 separately through `elems_publish_page` with freshly inspected publication state.
 
-MCP Event configuration does not edit capacity. The accepted Stage 3A Runtime enforces published
-seat capacity; activation must independently verify the barrier and Runtime compatibility. These tools do not activate public
-registration, create registrations, modify historical records, or deploy Stage 3A protected admission.
+MCP Event configuration does not edit capacity. A Runtime with the protected admission barrier enforces
+published seat capacity; activation must independently verify the barrier and Runtime compatibility. These tools do not activate public
+registration, create registrations, modify historical records, or deploy protected admission.
 
 For inactive session checkbox preparation and legacy Event mirror inspection, use
 `elems_get_event_session_bindings`, `elems_validate_event_session_bindings` and
-`elems_configure_event_session_bindings` as documented in `elems://docs/forms-and-interaction`.
+`elems_configure_event_session_bindings` as documented in `elems://docs/forms`.
 Generic Event/checkbox command mutation remains protected.
 
 Opt-in dynamic session selectors are configured through `elems_get_event_session_selector`,

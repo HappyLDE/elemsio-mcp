@@ -151,3 +151,32 @@ test('checkout document keeps its public Runtime contracts', () => {
   assert.match(checkout, /no dedicated `checkout` function type/i)
   assert.match(checkout, /Do not substitute hardcoded locale URLs/)
 })
+
+// Resources registered by the MCP server itself rather than synchronized from this repository.
+const serverRegisteredResources = new Set(['elems://docs/markup-v1'])
+
+test('every elems://docs link names a registered resource', () => {
+  const registered = new Set([...authoringDocs.map(({ uri }) => uri), ...serverRegisteredResources])
+  for (const file of publicMarkdown) {
+    for (const [uri] of read(file).matchAll(/elems:\/\/docs\/[\w-]+/g)) {
+      assert.ok(registered.has(uri), `${file} links unregistered resource ${uri}`)
+    }
+  }
+})
+
+test('public documents describe guarantees without storage-engine or milestone names', () => {
+  for (const file of publicMarkdown) {
+    const text = read(file)
+    assert.doesNotMatch(text, /\bMongo(?:DB)?\b|\bMySQL\b|\bSQL\b|\bStage\s+3A\b|\belement_functions\b/, file)
+  }
+  // Safety-critical event guarantees remain documented after the terminology change.
+  const forms = read('docs/forms-and-interaction.md')
+  assert.match(forms, /protected admission barrier enforces published capacities atomically/)
+  assert.match(forms, /admission rejects full selections atomically/)
+  assert.match(forms, /published atomically under protected admission gate, page and session locks/)
+  assert.match(forms, /in the same transaction as all locale page artifacts/)
+  assert.match(forms, /Do not rely on seat limits until `elems_get_event_registration_readiness` verifies/)
+  assert.match(read('docs/functions.md'), /MCP Event configuration does not edit capacity/)
+  assert.match(read('docs/pages-and-drafts.md'), /serializes under a lock on the canonical translation record/)
+  assert.match(read('docs/ecommerce.md'), /under canonical record locks/)
+})
