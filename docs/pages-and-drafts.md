@@ -99,7 +99,7 @@ publishing. Already branded titles with the site name at either separator bounda
 preventing duplicate branding. With no title, Runtime falls back to the Website name. No secondary
 locale's title or description is copied by the SEO operation.
 
-The update serializes under the canonical translation's MySQL row lock. A stale conflicting patch
+The update serializes under a lock on the canonical translation record. A stale conflicting patch
 returns CONFLICT. A same-value retry returns `already_applied` without changing unrelated values or
 publication state. Concurrent conflicting patches yield one winner and one conflict. Read again
 before changing the intent of a stale request.
@@ -118,7 +118,7 @@ canonical link, Open Graph title/description/image/url/type, and Twitter card/ti
 OG type is `website` for ordinary Pages; Twitter uses `summary_large_image` with a valid public image
 and `summary` without one. SVG remains a valid public OG image, while Twitter omits SVG
 images and uses `summary`. Missing descriptions/images are omitted, including their social tags.
-The legacy database description sentinel `0` is treated as absent. Canonical and OG URLs are the
+The legacy stored description sentinel `0` is treated as absent. Canonical and OG URLs are the
 same derived HTTPS production URL: the existing preferred attached custom domain wins over the
 managed preview domain; without a custom domain, the preferred managed domain is used. Redirected
 and deleted domains are excluded. The preferred domain's default locale (or Website default) has no

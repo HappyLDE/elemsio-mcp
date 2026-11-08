@@ -42,7 +42,7 @@ Detached templates use the same template tools without `page_id`: inspect with
 `elems_get_template_elements`, then use the returned structural and behavior targets with
 `elems_validate_template_element`, `elems_insert_template_element`, `elems_update_element`, and
 `elems_delete_element`. The API verifies the template belongs to the scoped website and resolves its
-Mongo root directly; it does not invent a page context or substitute the website default. A
+canonical source root directly; it does not invent a page context or substitute the website default. A
 `functionType: "menu"` provider must reference a menu owned by that same website.
 
 Generate a draft with `elems_generate_template_draft`, passing the current
