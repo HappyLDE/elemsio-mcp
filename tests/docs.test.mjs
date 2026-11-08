@@ -180,3 +180,46 @@ test('public documents describe guarantees without storage-engine or milestone n
   assert.match(read('docs/pages-and-drafts.md'), /serializes under a lock on the canonical translation record/)
   assert.match(read('docs/ecommerce.md'), /under canonical record locks/)
 })
+
+// MCP clients receive each authoring document as a standalone elems://docs/* resource, so relative
+// targets such as `forms-and-interaction.md` or `docs/pages-and-drafts.md#anchor` cannot resolve.
+// Served documents may only reference other documents by registered resource URI.
+const markdownLinkTargets = (text) => {
+  const prose = text.replace(/^(```|~~~)[\s\S]*?^\1/gm, '').replace(/`[^`\n]*`/g, '')
+  return [
+    ...[...prose.matchAll(/!?\[[^\]\n]*\]\(\s*<?([^)\s>]*)/g)].map(([, target]) => target),
+    ...[...prose.matchAll(/^\s{0,3}\[[^\]\n]+\]:\s*<?(\S*?)>?(?:\s|$)/gm)].map(([, target]) => target),
+    ...[...prose.matchAll(/<a\s[^>]*href\s*=\s*["']([^"']*)["']/gi)].map(([, target]) => target),
+  ]
+}
+const resolvableInMcp = (target) => /^(?:https:\/\/|elems:\/\/docs\/[\w-]+$|mailto:)/.test(target)
+
+test('served authoring documents contain no relative links that cannot resolve in MCP', () => {
+  for (const { file } of authoringDocs) {
+    for (const target of markdownLinkTargets(read(file))) {
+      assert.ok(resolvableInMcp(target), `${file} links "${target}", which cannot resolve as an MCP resource`)
+    }
+  }
+})
+
+test('relative link detection rejects unsupported forms and accepts registered URIs', () => {
+  for (const sample of [
+    'see [Forms](forms-and-interaction.md).',
+    'see [SEO](docs/pages-and-drafts.md#public-page-seo-definition-of-done).',
+    'see [here](#local-anchor).',
+    'see [ref][forms].\n\n[forms]: forms-and-interaction.md',
+    'see <a href="checkout.md">checkout</a>.',
+    'see [plain](http://example.com).',
+  ]) {
+    assert.ok(!markdownLinkTargets(sample).every(resolvableInMcp), sample)
+  }
+  for (const sample of [
+    'load `elems://docs/forms`.',
+    'load [forms](elems://docs/forms).',
+    'see [spec](https://example.com/spec#part).',
+    'markup `[x](relative.md)` inside code is not a link.',
+    '```\n[x](relative.md)\n```',
+  ]) {
+    assert.ok(markdownLinkTargets(sample).every(resolvableInMcp), sample)
+  }
+})

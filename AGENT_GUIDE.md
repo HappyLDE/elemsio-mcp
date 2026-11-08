@@ -21,8 +21,8 @@ resource it recommends. Do not load the complete authoring corpus by default.
   drafts, preview meaningful changes, and perform browser QA after visual or interactive changes.
 - Public Page SEO readiness is part of completion for new/materially updated Pages unless the user
   explicitly opts out; minor cosmetic edits verify without rewriting good SEO. Before publication or
-  final acceptance, read [the canonical public Page SEO policy](docs/pages-and-drafts.md#public-page-seo-definition-of-done)
-  (`elems://docs/pages` describes the Page SEO capability). Check effective title/description,
+  final acceptance, read the canonical public Page SEO policy in `elems://docs/pages` (section
+  "Public Page SEO definition of done"). Check effective title/description,
   canonical/production domain, OG/Twitter, duplicates, relevant existing Website Media, and locale.
   Respect private/auth-only indexing boundaries. Report compact SEO status and `OG IMAGE MISSING`
   when no suitable existing image exists; that alone does not block completion unless required.
