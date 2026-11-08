@@ -37,6 +37,20 @@ name -> values).
 For locale selectors and product price bindings, prefer their dedicated tools rather than composing
 raw commands.
 
+## Shipping address item ID
+
+Inside an authenticated `shippingAddresses` provider, bind an address ID to a `data-*` attribute on
+the repeated item or one of its descendants:
+
+```text
+0 div fn="shippingAddresses"
+  1 article cmd.shippingAddresses="loop:" cmd.shippingAddressItemId="prop:data-shipping-address-id"
+```
+
+The command resolves only the current `elementFunctionShippingAddressItem.id`, applies HTML escaping,
+and requires the active provider and loop scope. It accepts only `prop:data-*`; arbitrary Liquid and
+other attribute targets are rejected.
+
 ## Current command allowlist
 
 The following names are the external behavior validator's complete current allowlist. A name being
@@ -79,7 +93,7 @@ shippingAddressCountry shippingAddressCountryCode shippingAddressZipcode shippin
 shippingAddresses shippingAddressItemFirstname shippingAddressItemLastname shippingAddressItemFullName
 shippingAddressItemPhoneNumber shippingAddressItemStreet shippingAddressItemStreetInfo
 shippingAddressItemCity shippingAddressItemState shippingAddressItemCountry shippingAddressItemZipcode
-shippingAddressItemIsDefault shippingAddressItemIsInCart clientOrders clientOrdersHasItems
+shippingAddressItemId shippingAddressItemIsDefault shippingAddressItemIsInCart clientOrders clientOrdersHasItems
 clientOrdersEmpty clientOrdersHasMultiplePages clientOrdersHasNextPage clientOrdersHasPreviousPage
 clientOrdersTotal clientOrdersCurrentPage clientOrdersLastPage clientOrderIdentifier clientOrderNumber
 clientOrderDate clientOrderCreatedAt clientOrderStatus clientOrderStatusFormatted

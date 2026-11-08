@@ -65,7 +65,7 @@ Important value constraints include:
 - `parentId`, `postId`, and `mdElementId` use the inspected canonical identifier form.
 
 Supported `formType` values are `event_registration`, `payment`, `login`, `logout`, `register`,
-`contact`, `create_shipping_address`, `edit_shipping_address`, and `delete_shipping_address`. Auth
+`register_account_only`, `contact`, `create_shipping_address`, `edit_shipping_address`, and `delete_shipping_address`. Auth
 forms should use the bounded preset tool/profile, not hand-authored credentials, endpoints, sessions,
 password values, or redirects.
 
