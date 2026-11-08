@@ -1,53 +1,42 @@
 # ELEMS Modern V2 Native Ecommerce Checkout
 
-This document records the source-backed investigation of the public storefront checkout used by
-Ringador. It distinguishes observed behavior from the page details that remain inaccessible through
-MCP. The Ringador inspection is evidence about that existing site, not a promise that the same page
-can already be reproduced safely on another website.
+This document describes how a Modern V2 storefront checkout works in Runtime and what MCP can and
+cannot currently author for it. It separates confirmed platform behavior from page details that an
+agent must verify on the target website before reusing or reproducing a checkout.
 
 ## Confirmed behavior
 
 ### It is a normal Modern V2 page
 
-Ringador (website `167`) has a published page `3043` at `/checkout`, with effective template `268`.
-The page is an ordinary `page` with `system_page_type` unset. Its route is not a reserved checkout
-route: Runtime sends unmatched GET and POST paths to `WebsitesController.index`, resolves the
+A storefront checkout is typically an ordinary published `page` at a slug such as `/checkout`, with
+`system_page_type` unset and a normal effective template. Its route is not a reserved checkout route:
+Runtime handles unmatched GET and POST paths with the generic page handler, resolves the
 website/domain and locale, then resolves the path slug against the website's pages and its
 translation for the selected locale.
 
-Source: `elemsio-runtime/start/routes.ts` (`Route.get('*')`, `Route.post('*')`);
-`elemsio-runtime/app/Controllers/Http/WebsitesController.ts` (`index`).
-
-For a Modern V2 page, `index` loads the effective template and the published page/template element
+For a Modern V2 page, Runtime loads the effective template and the published page/template element
 functions, builds their runtime data contexts, and renders the published page and template content.
-Both page-owned and template-owned functions are supported by this renderer; the source inspection
-does not establish which owner contains Ringador's checkout form.
-
-Source: `elemsio-runtime/app/Controllers/Http/WebsitesController.ts` (`index`, V2 rendering and
-`getRuntimeElementFunctions` call around the page/template function query).
+Both page-owned and template-owned functions are supported. Which owner contains a particular
+website's checkout form must be confirmed by inspecting that website.
 
 ### Checkout uses existing ecommerce functions
 
-The Runtime recognizes these generic function types in the V2 renderer:
+Runtime recognizes these generic function types for checkout:
 
 - `cart` reads and hydrates the website's current cart and payment configuration;
 - `shippingCountries` supplies the country options used by checkout shipping UI;
 - `paymentMethods` and `checkoutPaymentMethods` supply the configured checkout payment methods.
 
-The Ringador template inspection confirmed a template-owned `cart` function on its “Cart section”.
-The inspected “Checkout btn” is a regular anchor to `{{ base_url }}/checkout`, not a checkout
-function. No dedicated `checkout` function type or checkout preset is supported by the inspected
-Runtime and MCP function allowlists.
-
-Source: `elemsio-runtime/app/Controllers/Http/WebsitesController.ts` (`index`, V2 function switch);
-`elemsio-mcp-public/docs/functions.md` (public function allowlist).
+A common composition places a template-owned `cart` function on a shared cart section, with a
+“Checkout” button that is a regular anchor to `{{ base_url }}/checkout` rather than a checkout
+function. There is no dedicated `checkout` function type or checkout preset in the Runtime or MCP
+function allowlists (see `elems://docs/functions`).
 
 ### Runtime supplies shared checkout JavaScript and server actions
 
-`appendStorefrontRuntimeScripts` calls `appendCheckoutPaymentsRuntimeScript`. The shared checkout
-script activates when rendered content contains one of the recognized hooks below; it then manages
-checkout UI state and sends actions to Runtime. This is generic storefront support, not evidence of a
-page-specific script on page 3043.
+Runtime appends shared storefront checkout JavaScript. The script activates when rendered content
+contains one of the recognized hooks below; it then manages checkout UI state and sends actions to
+Runtime. This is generic storefront support; a checkout page does not need its own script for it.
 
 Recognized activation markers include:
 
@@ -60,8 +49,8 @@ The script also looks for checkout regions such as `.checkout-payment-section`,
 `.checkout-stripe-start-btn`, `.checkout-dynamic-shipping-section`, `.checkout-paypal-wrapper`,
 `#checkout-paypal-buttons`, and `.checkout-dev-payment-wrapper`. Guest/client checkout roots and
 customer, shipping, billing, payment, and shipping-rate controls are queried by the shared code.
-These are Runtime integration hooks; this list is not a complete required page schema, and the source
-does not establish that every hook is required on every checkout.
+These are Runtime integration hooks; this list is not a complete required page schema, and not every
+hook is required on every checkout.
 
 POST requests are routed through the same generic page handler. Runtime uses the submitted element
 identifier (`eid`) to find the owning function and dispatches `cart_action` for a `cart` provider.
@@ -70,10 +59,6 @@ Existing handlers include `set_guest_checkout_details`, `get_checkout_cart`,
 `create_paypal_order`/`capture_paypal_order`. Server-side cart, shipping, and payment checks remain
 authoritative.
 
-Source: `elemsio-runtime/app/Controllers/Http/WebsitesController.ts`
-(`appendCheckoutPaymentsRuntimeScript`, `appendStorefrontRuntimeScripts`, `index` POST handling and
-the `cart` action switch).
-
 ### Cart and locale context are preserved by Runtime
 
 For a guest, checkout reads the cart identifier from the existing Runtime session and selects a
@@ -81,30 +66,19 @@ guest cart belonging to that website. For a signed-in client, it first checks th
 that client, then falls back to a cart scoped to the current website. The checkout route does not
 itself create a replacement cart. The same website session continues across locale-prefixed routes.
 
-Runtime derives `base_url` from the selected locale and website/domain defaults. Ringador's inspected
-template link uses `{{ base_url }}/checkout`; this keeps the checkout path in the current locale
-context.
+Runtime derives `base_url` from the selected locale and website/domain defaults. A template link to
+`{{ base_url }}/checkout` therefore keeps the checkout path in the current locale context.
 
-Source: `elemsio-runtime/app/Controllers/Http/WebsitesController.ts`
-(`getActiveCheckoutCartV2`, `index` locale/base URL construction and V2 cart rendering).
+## Verify before reuse
 
-## Unverified details
-
-- `elems_get_page` confirms page 3043 exists and is published, but `elems_get_page_elements` returns
-  MCP `PAGE_NOT_FOUND`. The template can be inspected; the page's exact V2 element tree cannot.
-- Therefore the exact checkout element ownership, markup tree, form shape, and any page-specific
-  JavaScript on page 3043 remain unverified.
-- The API derives a V2 root ID from the page row, then its content-context endpoint requires a
-  document with that exact ID and `type: "page"`. The endpoint returns `page_content_not_available`
-  when this predicate fails. The underlying cause for page 3043—missing document, mismatched ID, or
-  wrong document type—has not been confirmed from source inspection alone.
+- `elems_get_page` can confirm that a checkout page exists and is published while
+  `elems_get_page_elements` still returns `PAGE_NOT_FOUND`. In that case the template may be
+  inspectable, but the page's exact V2 element tree is not.
 - `PAGE_NOT_FOUND` is MCP's normalized error for page-content errors. It does not mean the published
   Page record or rendered `/checkout` route is absent.
-- No source evidence justifies creating a new checkout `functionType` or a checkout preset.
-
-Source: `elemsio-api/app/Services/BaseWebsiteContextResolver.ts` (`pageIdentity`);
-`elemsio-api/app/Services/PageContentContextHttpEndpoint.ts` (`resolve`, `isExactPageRoot`);
-`elemsio-api/app/Services/Mcp/ElemsMcpApplication.ts` (`getPageElements`, `normalizedError`).
+- Until a readback succeeds, the checkout's element ownership, markup tree, form shape, and any
+  page-specific JavaScript are unverified. Do not infer them from another website.
+- Do not create a new checkout `functionType` or a checkout preset; none exists.
 
 ## Known MCP limitations
 
@@ -114,33 +88,27 @@ and commands with compare-and-set values. Page insertion/import is normally stat
 configured through inspected canonical targets. The published checkout is never created by the page
 creation operation alone.
 
-The current MCP content inspection path cannot read Ringador page 3043's V2 root, so it cannot
-provide a verified tree to reuse. Its error normalization maps `page_content_not_available` to
-`PAGE_NOT_FOUND`, obscuring the difference between an absent Page and unavailable content.
+When a checkout page's V2 content cannot be read through MCP, MCP cannot provide a verified tree to
+reuse, and its error normalization does not distinguish an absent Page from unavailable content.
 
-MCP supports native Page-ID destinations for menu items. Ordinary page/template anchors have
-localized href editing, but no structured Page-ID destination that Runtime can resolve in the
-current locale. Ringador's `{{ base_url }}/checkout` anchor is evidence of its existing link, not a
-reusable native page-reference operation in MCP. Do not substitute hardcoded locale URLs or claim
-that the checkout link can already be safely connected across locales.
+MCP supports native Page-ID destinations for menu items (see `elems://docs/menus`). Ordinary
+page/template anchors have localized href editing, but no structured Page-ID destination that Runtime
+can resolve in the current locale. An existing `{{ base_url }}/checkout` anchor is not a reusable
+native page-reference operation in MCP. Do not substitute hardcoded locale URLs or claim that a
+checkout link can already be safely connected across locales.
 
-Sources: `elemsio-mcp-public/docs/pages-and-drafts.md`, `docs/functions.md`, `docs/commands-runtime.md`,
-and `docs/menus.md`; `elemsio-api/app/Services/Mcp/ElemsMcpApplication.ts` (`getPageElements`,
-`normalizedError`).
+See also `elems://docs/pages`, `elems://docs/functions`, and `elems://docs/commands`.
 
-## Recommended next steps
+## Authoring guidance
 
-1. Make the canonical V2 source for page 3043 inspectable through the supported MCP content path, or
-   expose a safe read-only inspection of its published V2 structure. Preserve the distinction
-   between a missing Page and unavailable page content in the returned MCP error.
-2. Once readable, verify the exact checkout tree, behavior ownership, form/action bindings, and
-   whether the page has its own scripts. Document only what that readback confirms.
-3. Add a reusable page-reference binding for ordinary anchors, resolved against the current locale,
-   following the existing native Page destination model used by menus.
-4. Only then assess whether existing static structure and native function operations can reproduce
+1. Inspect the target website's checkout page and effective template through MCP. If the page's V2
+   content is unreadable, stop and report that limitation rather than guessing its structure.
+2. When readable, verify the exact checkout tree, behavior ownership, form/action bindings, and
+   whether the page has its own scripts. Document and rely only on what readback confirms.
+3. Only then assess whether existing static structure and native function operations can reproduce
    that verified composition on another website. Preview empty and populated carts, shipping and
    payment states, and each active locale before treating a reproduction as safe.
 
-Until those checks are possible, do not claim that Pretzel King's checkout can already be reproduced
-safely. The existing native cart is confirmed, but the checkout page structure and locale-aware
-drawer-to-page binding are not.
+Until those checks pass, do not claim that a checkout can be reproduced safely on another website.
+A native cart can be confirmed independently, but the checkout page structure and a locale-aware
+link from a cart drawer to the checkout page require separate verification.
