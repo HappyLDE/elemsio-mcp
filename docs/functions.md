@@ -148,5 +148,5 @@ Canonical Event session updates accept optional `localized_titles`, `retired` an
 `order`; all existing identities remain in the configuration and historical registrations are retained.
 
 Native Event form preparation and explicit activation/publication use the typed MCP 1.62.0 workflow
-in [Forms and Interaction](forms-and-interaction.md). Generic function/command mutation remains
+in `elems://docs/forms`. Generic function/command mutation remains
 restricted; never set raw formType or bypass its domain validation to activate registration.
