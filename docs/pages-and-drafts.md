@@ -188,7 +188,7 @@ other placeholder metadata on customer-facing published Pages.
 ### Canonical URL and production domain
 
 Verify the effective canonical URL and OG URL, including locale routing. When a production custom
-domain exists, both must use that production domain. A managed preview `*.myelems.com` URL is not an
+domain exists, both must use that production domain. A managed preview `*.elems.io` URL is not an
 acceptable canonical for a live custom-domain Website. Follow canonical preferred-domain and locale
 semantics; do not author raw URL overrides. Preview routes, tokens, query strings, and fragments must
 not leak into canonical/social URLs. Report missing or incorrect domain projection explicitly.
