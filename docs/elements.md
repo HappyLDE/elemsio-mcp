@@ -47,13 +47,29 @@ mutation-ready identifier and fresh hash emitted by the matching inspection surf
 | DOM type | `dom_type_targets[].target_id` and `dom_type_hash` |
 | Head stylesheet declaration | `head_declarations.head.children_hash`, then the declaration `target_id` and `declaration_hash` for removal |
 | Behavior | `behavior_targets[].target_id` and `behavior_hash` |
-| Existing owned JavaScript | `script_targets[].target_id` and `script_hash` |
+| Existing or initial owned JavaScript | `script_targets[].target_id` and `script_hash` |
 | HTML Embed | `html_embeds[].mdid` and `embed_hash` |
 | Narrow child insert/delete | `structural_targets[]` and parent `children_hash` |
 | Full section replacement | `sections[].replace_target_id` |
 
-`snapshot_target_id` is read-only metadata. Do not construct namespaced target IDs, strip parts from
-them, substitute a search-result `target_id`, or guess an `mdid`.
+Static HTML `id` is an eligible nonlocalized attribute on ordinary page- or template-owned elements.
+Inspect the exact `elements[].update_target_id` ending in `:attribute:id`, then pass it unchanged to
+`elems_update_element` with the exact current value/hash (`null` means no id). New IDs must match
+`[A-Za-z][A-Za-z0-9_-]{0,127}` and be unique in the affected page tree. The write preserves other
+attributes and element content, uses CAS, regenerates drafts, and never publishes.
+
+`snapshot_target_id` is read-only metadata. For JavaScript only, use the canonical
+`md:<mdid>:javascript` selector with an mdid returned by the same page/template inspection; do not
+guess an mdid or use a search-result target as a mutation input. Other namespaced mutation target IDs
+must still be copied unchanged from their matching inspection array.
+
+JavaScript inspection is opt-in. Without `script_target_id`, `script_targets` is empty by design and
+does not prove that no JavaScript can be added. When the selector addresses a normal owned element
+whose `contentJavascript` is absent, null, or empty, the selected target reports an empty source and
+the SHA-256 hash of that empty source. `elems_update_element_javascript` can then set the
+ELEMS-managed `contentJavascript` property. ELEMS renders a populated property as that element's
+`<script>` output; this is separate from raw `<script>` markup, which remains forbidden by Markup V1
+and HTML Embed.
 
 For a native contact form, inspect `behavior_targets[].contact_form` together with its ordinary
 element attributes and command bindings. The descriptor reports whether the provider is on a

@@ -153,13 +153,20 @@ hash. Safe HTTPS iframes and passive container/link/image/picture/audio/video fr
 scripts, event handlers, `srcdoc`, executable URLs, Liquid, active/declaration tags, `object`, and
 `embed` are rejected. The value is non-localized and draft-only.
 
-## Existing owned JavaScript
+## Owned JavaScript
 
-`elems_update_element_javascript` can replace the complete source of one explicitly inspected,
-ordinary page- or template-owned script target. It cannot create an arbitrary script target through
-Markup V1. Pass the exact `script_targets[].target_id` and `script_hash`. The server checks ownership,
-size, syntax without executing it, closing-script injection, and high-confidence secrets; modules,
-shared/prefab, invalid, and unsafe targets remain blocked.
+`elems_update_element_javascript` can set or replace the complete `contentJavascript` source on one
+explicitly inspected, ordinary page- or template-owned element. Raw source inspection is opt-in:
+without `script_target_id`, `script_targets: []` is expected and does not prove that JavaScript
+cannot be added. Select the exact `md:<mdid>:javascript` target using an mdid returned by the same
+inspection. A selected element may have absent, null, or empty `contentJavascript`; ELEMS exposes that
+state as an empty source with the hash of the empty string, so the MCP tool can populate it without a
+new raw `<script>` element or Markup V1 script markup. The server checks ownership, size, syntax
+without executing it, closing-script injection, and high-confidence secrets; modules, shared/prefab,
+invalid, and unsafe targets remain blocked.
+
+The element property is rendered by ELEMS as the element-owned `<script>` output. Raw `<script>` markup
+being forbidden by Markup V1/HTML Embed is a separate concern.
 
 JavaScript is owned by the `MdElement` that stores it. Do not mix unrelated components in one owner
 or add website-specific platform/API behavior. Prefer functions and commands for generic runtime
