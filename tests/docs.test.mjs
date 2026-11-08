@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import test from 'node:test'
@@ -65,4 +66,88 @@ test('public documents contain no consumer-irrelevant operational material', () 
   const corpus = authoringDocs.map(({ file }) => read(file)).join('\n')
   assert.doesNotMatch(corpus, /\/home\/|ssh\s|mongodb:\/\/|mysql:\/\/|BEGIN [A-Z ]*PRIVATE KEY/)
   assert.doesNotMatch(corpus, /deploy(?:ment)? lock|nginx|pm2|production topology/i)
+})
+
+const publicMarkdown = [
+  ...new Set([
+    ...authoringDocs.map(({ file }) => file),
+    'README.md',
+    'SECURITY.md',
+    'ONBOARDING_TEST.md',
+    'CLAUDE.md',
+  ]),
+]
+
+// SHA-256 of known tenant/project names (lowercase letters and digits only, words joined), so the
+// denylist itself discloses nothing. Single words and adjacent word pairs are checked.
+const disclosedNameHashes = new Set([
+  '6669c0eaf969f2e8bd88c478c6656550b48e75df4addd5c13ac57e73f3fc7d74',
+  '5947cd7dadde2627f46142da77b3f40ef7be278779980cc580c928eeb7ad60d7',
+  '9d81e808f4c3d66a8476d0b8f600ea7c5a92ef5e70cdc8d06f75c6e9bda3eec2',
+])
+const sha256 = (value) => crypto.createHash('sha256').update(value, 'utf8').digest('hex')
+
+test('public documents name no known tenant or customer project', () => {
+  for (const file of publicMarkdown) {
+    const words = read(file).toLowerCase().match(/[a-z0-9]+/g) || []
+    words.forEach((word, index) => {
+      for (const candidate of [word, word + (words[index + 1] || '')]) {
+        assert.ok(!disclosedNameHashes.has(sha256(candidate)), `${file} names a known tenant near "${word}"`)
+      }
+    })
+  }
+})
+
+test('public documents contain no tenant identifiers, source paths, or private hosts', () => {
+  for (const file of publicMarkdown) {
+    const text = read(file)
+    // Concrete numeric record identifiers such as "website 167", "page `3043`", "template ID 268".
+    assert.doesNotMatch(
+      text,
+      /\b(?:website|page|template|entity|product|variant|menu|order|post|event|media)s?\s+(?:id\s+)?`?\d{2,}\b/i,
+      `${file} contains a concrete record identifier`
+    )
+    // Internal repository or source-file references.
+    assert.doesNotMatch(text, /\belemsio-(?:api|runtime|modern|mail|ai-ops|pos|tw-jit|mcp-public)\b/, file)
+    assert.doesNotMatch(
+      text,
+      /\b(?:app|start|config|database|providers)\/[\w./-]+\.(?:ts|js|mjs|json)\b|Controllers\/Http|\w+Controller\.\w+/,
+      `${file} references private source files`
+    )
+    // Local machine paths.
+    assert.doesNotMatch(text, /(?:^|[\s`(])(?:\/home\/|\/Users\/|\/opt\/|\/root\/|[A-Z]:\\Users\\)/m, file)
+    // Only documented public ELEMS hosts.
+    for (const [host] of text.matchAll(/\b[\w-]+(?:\.[\w-]+)*\.(?:elems\.io|myelems\.com)\b/g)) {
+      assert.ok(['api.elems.io', 'app.elems.io'].includes(host), `${file} names non-public host ${host}`)
+    }
+  }
+})
+
+test('checkout document keeps its public Runtime contracts', () => {
+  const checkout = read('docs/checkout.md')
+  for (const contract of [
+    'cart',
+    'shippingCountries',
+    'paymentMethods',
+    'checkoutPaymentMethods',
+    '{{ base_url }}/checkout',
+    'checkout-stripe-payment-element',
+    'create_stripe_payment_intent',
+    'shipping-zone-rate-options',
+    'checkout-discount-code',
+    '.checkout-payment-section',
+    '#checkout-paypal-buttons',
+    'eid',
+    'cart_action',
+    'set_guest_checkout_details',
+    'get_checkout_cart',
+    'set_shipping_zone_rate',
+    'create_paypal_order',
+    'capture_paypal_order',
+    'PAGE_NOT_FOUND',
+  ]) {
+    assert.ok(checkout.includes(contract), `checkout.md lost ${contract}`)
+  }
+  assert.match(checkout, /no dedicated `checkout` function type/i)
+  assert.match(checkout, /Do not substitute hardcoded locale URLs/)
 })

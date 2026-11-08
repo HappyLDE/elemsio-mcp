@@ -32,8 +32,8 @@ preset tool is preferred for account pages. Load `elems://docs/functions` and
 `elems://docs/commands` only when composing or diagnosing these dynamic trees.
 
 For the confirmed Modern V2 storefront checkout path, its Runtime hooks, locale behavior, and MCP
-authoring limits, load [`checkout.md`](checkout.md) · `elems://docs/checkout`. That document records
-the Ringador investigation and separates verified behavior from unknown page structure.
+authoring limits, load [`checkout.md`](checkout.md) · `elems://docs/checkout`. That document
+separates confirmed platform behavior from page structure that must be verified on each website.
 
 Place loop commands inside the matching provider scope and keep product, collection/search-item,
 cart-item, address, payment-method, and order-item contexts separate. Do not convert a collection or

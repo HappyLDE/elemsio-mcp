@@ -37,7 +37,7 @@ Use the normal ELEMS account interface:
 1. Create or sign in to your ELEMS account at [app.elems.io](https://app.elems.io).
 2. Open **Account**.
 3. Find **Developer & API → MCP / API tokens**.
-4. Enter a descriptive name such as `Omarchy Codex` and choose **Create token**.
+4. Enter a descriptive name such as `Laptop Codex` and choose **Create token**.
 5. Copy the token from the one-time display and store it securely.
 
 The token cannot be displayed again after you close the one-time view. The same account page lists
