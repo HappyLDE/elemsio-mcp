@@ -72,8 +72,11 @@ enables distance matching from an explicit origin address with its explicit `ori
 them from the owner or another authoritative source, and do not estimate distances from postal codes.
 Runtime then charges `shipping_cost + rate_per_km x one-way route kilometres` (road distance from the
 configured routing provider), rounded to the minor unit, and the free-shipping threshold still
-applies. A routing failure blocks the quote instead of falling back to a flat price. Omitted fields
-keep their stored values; postal-code and distance-range matching are never changed by this tool.
+applies. A routing failure blocks the quote instead of falling back to a flat price. Passing
+`distance_pricing: null` clears only the per-km rate (distance matching and the origin stay), so a
+zone can return to its flat `shipping_cost`. `free_shipping_from: 0` is rejected; use `null` to remove
+the threshold. Omitted fields keep their stored values; postal-code and distance-range matching are
+never changed by this tool.
 
 Promo tools list, create, and CAS-update website-scoped global percentage codes. Quote with
 `elems_quote_promo_code`; clients never supply or calculate the authoritative discount amount.
