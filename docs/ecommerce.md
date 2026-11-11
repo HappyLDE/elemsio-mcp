@@ -63,6 +63,18 @@ that feeds Runtime `shippingCountries`. Shared-zone, legacy-rate, duplicate, cat
 ambiguous settings are rejected when a targeted update could affect another country. Removal is
 available only for an isolated matching zone with no rates, carts, or orders.
 
+Each listed zone also reports its free-shipping threshold, postal-code matching, distance matching
+(origin address, origin coordinates, minimum/maximum metres) and optional per-km rate. When a country
+belongs to several zones, pass the inspected `zone_id` to select one existing zone. On that zone,
+`free_shipping_from` sets the free-shipping threshold (`null` clears it), and `distance_pricing`
+enables distance matching from an explicit origin address with its explicit `origin_latitude` and
+`origin_longitude` and sets `rate_per_km`. Coordinates are never inferred from the address; obtain
+them from the owner or another authoritative source, and do not estimate distances from postal codes.
+Runtime then charges `shipping_cost + rate_per_km x one-way route kilometres` (road distance from the
+configured routing provider), rounded to the minor unit, and the free-shipping threshold still
+applies. A routing failure blocks the quote instead of falling back to a flat price. Omitted fields
+keep their stored values; postal-code and distance-range matching are never changed by this tool.
+
 Promo tools list, create, and CAS-update website-scoped global percentage codes. Quote with
 `elems_quote_promo_code`; clients never supply or calculate the authoritative discount amount.
 
