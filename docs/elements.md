@@ -97,6 +97,36 @@ before import; narrow page/template insertion uses the fresh parent `children_ha
 `srcset`/`sizes` are not currently in the public attribute allowlist. Inline handlers such as
 `onerror`, raw HTML, and inline style remain forbidden.
 
+## Static text inside runtime function contexts
+
+Elements under a recognized runtime function owner, such as a native `cart` drawer or a canonical
+product provider, normally report `dynamic_function_context` for structure, DOM type, and behavior.
+The owner's script renders runtime output into nodes it selects by class, id, data attribute, or tag.
+Hand-authored copy beside that output, such as a delivery notice or a summary label, can still be
+mutation-ready text.
+
+A descendant receives a localized `content` target in `elements[].update_target_id` only when all of
+the following hold:
+
+- it is a leaf with no children;
+- it has no function, function data, commands, or loop bindings, and no script, embed, prefab, or
+  template-region ownership of its own;
+- every locale value is plain text with no Liquid delimiters and no markup;
+- no script on its ancestor path selects it through its own class, id, data attribute, or tag. A
+  `document.createElement('tag')` argument creates a new node and is not a selector;
+- an owner script containing Liquid contains only the canonical native cart binding line
+  (`window.cart = {{ elementFunction_cart.cart | json }}`) on a native `cart` owner. Any other
+  template expression keeps that script unclassifiable, and the descendant stays protected.
+
+Replacing such a value changes only the text the Runtime renders for that leaf. The function owner,
+its `functionType`/`functionData`, commands, and script are unchanged. Runtime scripts locate the
+nodes they update by stable DOM hooks, not by visible copy, so new wording does not move a selector
+match. Leaves that are runtime output (for example a total written with `innerHTML`), command-bound
+or loop-bound leaves, and Liquid-bearing leaves expose no text target and are rejected by
+`elems_update_element`. DOM-type, structural, behavior, and JavaScript restrictions in these
+contexts are unaffected; the owner and every non-leaf element keep their protections. Use the
+ordinary text CAS flow: the write is draft-only and never publishes.
+
 ## Inspection versus authority
 
 Search can return page-owned, template-owned, shared-prefab, or unknown elements. A found element is
