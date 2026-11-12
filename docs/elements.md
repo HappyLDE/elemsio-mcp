@@ -78,10 +78,25 @@ the Runtime challenge, explicit submit type, and success/error state bindings. A
 to a `div` is not a semantic contact form.
 
 Some older builder-authored links may expose a current `href` beginning with the exact canonical
-`{{ base_url }}` prefix. This is a migration-ready precondition, not accepted new content: pass the
-returned value and hash back unchanged as the expected state, then replace it with a normal safe
-relative, `http`, or `https` destination. Arbitrary Liquid, protocol-relative origins, executable
-schemes, event attributes, and non-allowlisted attributes remain unavailable.
+`{{ base_url }}` prefix. Pass the returned value and hash back unchanged as the expected state. A
+client never sends that Liquid as a replacement `value`; replace it with a normal safe relative,
+`http`, or `https` destination, or with a Page destination (below). Arbitrary Liquid,
+protocol-relative origins, executable schemes, event attributes, and non-allowlisted attributes
+remain unavailable.
+
+### Locale-aware Page destinations
+
+To point an anchor `attribute:href` target at a Page of the same website, call `elems_update_element`
+in text mode with `destination_page_id` instead of `value` (the two are mutually exclusive, and
+`destination_page_id` is accepted only for `attribute:href` targets). The server resolves that Page
+within the request's website and stores the canonical `{{ base_url }}/<slug>` href (`{{ base_url }}/`
+for the homepage). Runtime renders `base_url` as the visitor's canonical locale base, the same prefix
+native menu Page destinations use, so one stored value opens the Page in every active locale: no
+prefix for the default locale and `/<locale>` otherwise. Missing, cross-website, redirect,
+non-ordinary, and unsafe-slug Pages fail closed (`destination_page_not_found`,
+`destination_page_not_supported`, `destination_page_slug_not_supported`). The slug is resolved at
+write time; renaming the Page later does not rewrite the link. Readback returns the stored
+`{{ base_url }}/...` value, which is the next CAS precondition.
 
 ## Image targets
 
@@ -126,6 +141,44 @@ or loop-bound leaves, and Liquid-bearing leaves expose no text target and are re
 `elems_update_element`. DOM-type, structural, behavior, and JavaScript restrictions in these
 contexts are unaffected; the owner and every non-leaf element keep their protections. Use the
 ordinary text CAS flow: the write is draft-only and never publishes.
+
+### Static links inside runtime function contexts
+
+An `a` leaf in such a context is a *static link leaf* when it meets the static leaf rules above, has
+no event-handler attribute or other Liquid-bearing attribute, and its `href` is Liquid-free or the
+exact canonical `{{ base_url }}/...` form. For such a link only, an ancestor script's selector
+literals are evaluated against the link instead of matching every anchor by tag:
+
+- a selector list is understood only when it uses type, universal, class, id, and attribute selectors
+  with descendant/child/sibling combinators. Pseudo-classes (including `:not()`), escapes, and anything
+  else stay on the conservative path: any `a` in the literal still counts as a reference;
+- an item can be ruled out only by its right-most (subject) compound: a different element type, a
+  class the link does not have, or an `href` predicate that is provably false. Ids and other
+  attributes never rule a match out, and a literal equal to one of the link's own attribute values
+  stays a reference;
+- a Liquid-free `href` is rendered verbatim, so every attribute operator is decided exactly. A
+  `{{ base_url }}<path>` href renders as an unknown locale-aware prefix followed by `<path>`, so only
+  `=` and `$=` predicates decided by `<path>` can be false; `*=`, `^=`, `~=`, and `|=` may always
+  match. Use `a[href$="/cart"]`, not `a[href*="cart"]`, when a script must not claim such a link;
+- a string that cannot be a CSS selector (for example a translated message containing ". " or "!")
+  selects nothing and is not a reference.
+
+The refinement applies only to ancestor scripts that reach existing nodes through literal selector
+calls. A script that uses child or sibling traversal, `children`/`childNodes`, `document.links`,
+`getElementsBy*`, XPath or ranges, observer node lists, `event.target` other than
+`event.target.closest(...)`, a destructured `target`, or a computed selector argument keeps the
+existing conservative classification. As before, only scripts on the link's ancestor path are
+classified.
+
+When the refinement removes every reference, the link text gets an ordinary `content` target, and the
+link's `attribute:href` target is exposed with `internal_destination_only: true`. Such an href accepts
+only a same-origin path (`/...`, never `//...` or a backslash) or a `destination_page_id` Page
+destination; external URLs fail with `external_link_destination_not_supported`. Every replacement is
+classified again against the proposed value at the final compare-and-set: a destination that an
+ancestor selector would match (for example `/cart` under `a[href$="/cart"]`) fails with
+`link_destination_runtime_bound`. The link's DOM type, structure, behavior, and the owner script stay
+protected; class edits use `elems_update_element_classes` as before. Hrefs outside runtime contexts
+keep their existing rules.
 
 ## Inspection versus authority
 

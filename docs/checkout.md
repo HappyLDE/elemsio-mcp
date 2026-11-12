@@ -91,11 +91,14 @@ creation operation alone.
 When a checkout page's V2 content cannot be read through MCP, MCP cannot provide a verified tree to
 reuse, and its error normalization does not distinguish an absent Page from unavailable content.
 
-MCP supports native Page-ID destinations for menu items (see `elems://docs/menus`). Ordinary
-page/template anchors have localized href editing, but no structured Page-ID destination that Runtime
-can resolve in the current locale. An existing `{{ base_url }}/checkout` anchor is not a reusable
-native page-reference operation in MCP. Do not substitute hardcoded locale URLs or claim that a
-checkout link can already be safely connected across locales.
+MCP supports native Page-ID destinations for menu items (see `elems://docs/menus`). An ordinary
+page/template anchor `attribute:href` target accepts `destination_page_id` in `elems_update_element`
+text mode: the server stores the canonical `{{ base_url }}/<slug>` href of that same-website Page,
+which Runtime resolves in the visitor's locale (see `elems://docs/elements`).
+Do not substitute hardcoded locale URLs or claim that a checkout link is connected across locales
+before readback shows the stored destination. A checkout link inside a cart drawer whose script
+selects anchors generically (for example `a[href]`) remains protected until that script's anchor
+selectors are narrowed.
 
 See also `elems://docs/pages`, `elems://docs/functions`, and `elems://docs/commands`.
 
