@@ -146,36 +146,48 @@ ordinary text CAS flow: the write is draft-only and never publishes.
 
 An `a` leaf in such a context is a *static link leaf* when it meets the static leaf rules above, has
 no event-handler attribute or other Liquid-bearing attribute, and its `href` is Liquid-free or the
-exact canonical `{{ base_url }}/...` form. For such a link only, an ancestor script's selector
-literals are evaluated against the link instead of matching every anchor by tag:
+exact canonical `{{ base_url }}/...` form. For such a link only, script selectors are evaluated
+against the link instead of matching every anchor by tag:
 
-- a selector list is understood only when it uses type, universal, class, id, and attribute selectors
-  with descendant/child/sibling combinators. Pseudo-classes (including `:not()`), escapes, and anything
-  else stay on the conservative path: any `a` in the literal still counts as a reference;
-- an item can be ruled out only by its right-most (subject) compound: a different element type, a
-  class the link does not have, or an `href` predicate that is provably false. Ids and other
-  attributes never rule a match out, and a literal equal to one of the link's own attribute values
-  stays a reference;
+- a selector list is understood when it uses type, universal, class, id, attribute and pseudo
+  selectors with descendant/child/sibling combinators. Escapes, namespaces and anything else are not
+  understood and keep the link protected;
+- an item is ruled out only by its right-most (subject) compound, a conjunction: a different element
+  type, a class the link does not have, an id other than its own, an attribute the link does not
+  store, an `href` predicate that is provably false, or a `:not(...)` whose argument certainly matches
+  the link (for example `a[href]:not(.checkout-cta)` when the link has the `checkout-cta` class).
+  Values of other attributes and every other pseudo-class (`:hover`, `:nth-child()`) never rule a
+  match out;
 - a Liquid-free `href` is rendered verbatim, so every attribute operator is decided exactly. A
-  `{{ base_url }}<path>` href renders as an unknown locale-aware prefix followed by `<path>`, so only
-  `=` and `$=` predicates decided by `<path>` can be false; `*=`, `^=`, `~=`, and `|=` may always
-  match. Use `a[href$="/cart"]`, not `a[href*="cart"]`, when a script must not claim such a link;
+  `{{ base_url }}<path>` href renders as an unknown origin-and-locale prefix followed by `<path>`, so
+  only `=` and `$=` predicates decided by `<path>` can be false; `*=`, `^=`, `~=`, and `|=` may
+  always match;
 - a string that cannot be a CSS selector (for example a translated message containing ". " or "!")
   selects nothing and is not a reference.
 
-The refinement applies only to ancestor scripts that reach existing nodes through literal selector
-calls. A script that uses child or sibling traversal, `children`/`childNodes`, `document.links`,
-`getElementsBy*`, XPath or ranges, observer node lists, `event.target` other than
-`event.target.closest(...)`, a destructured `target`, or a computed selector argument keeps the
-existing conservative classification. As before, only scripts on the link's ancestor path are
-classified.
+Every script of the element tree is classified, not only scripts on the link's ancestor path: a
+document-wide selector reaches the link from any element. Each script must call selector APIs
+(`querySelector(All)`, `closest`, `matches`, `getElementById`) only with literal arguments, and every
+such argument must be understood and ruled out. A script that uses child or sibling traversal,
+`children`/`childNodes`, `document.links`, `getElementsBy*`, XPath or ranges, observer node lists,
+`event.target`/`document.activeElement` other than in `.closest(...)` or an `===`/`!==` comparison,
+an aliased or bound selector API, jQuery-style `$()`, computed string properties, string evaluation,
+or a rewrite of `body`/`documentElement` markup keeps the link protected, as does executable markup
+in any HTML embed of the tree. Scripts of another document rendered together with this tree (a
+Page's own scripts inside its Template, or the Template's scripts around a Page) are not inspected.
 
-When the refinement removes every reference, the link text gets an ordinary `content` target, and the
-link's `attribute:href` target is exposed with `internal_destination_only: true`. Such an href accepts
+To keep a script's link logic unchanged while excluding one link, keep its selector and add a
+`:not(.<class>)` for a class carried only by that link, then add the class to the link. Narrowing a
+selector by `href` instead (`a[href$="/cart"]`) changes behavior for links such as `/cart?step=2`
+that the original pathname logic handled, and substring predicates cannot exclude a
+`{{ base_url }}` link.
+
+When no script can select the link, the link text gets an ordinary `content` target, and the link's
+`attribute:href` target is exposed with `internal_destination_only: true`. Such an href accepts
 only a same-origin path (`/...`, never `//...` or a backslash) or a `destination_page_id` Page
 destination; external URLs fail with `external_link_destination_not_supported`. Every replacement is
-classified again against the proposed value at the final compare-and-set: a destination that an
-ancestor selector would match (for example `/cart` under `a[href$="/cart"]`) fails with
+classified again against the proposed value at the final compare-and-set: a destination that a
+script selector would match (for example `/cart` under `a[href$="/cart"]`) fails with
 `link_destination_runtime_bound`. The link's DOM type, structure, behavior, and the owner script stay
 protected; class edits use `elems_update_element_classes` as before. Hrefs outside runtime contexts
 keep their existing rules.
