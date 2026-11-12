@@ -165,16 +165,27 @@ against the link instead of matching every anchor by tag:
 - a string that cannot be a CSS selector (for example a translated message containing ". " or "!")
   selects nothing and is not a reference.
 
-Every script of the element tree is classified, not only scripts on the link's ancestor path: a
-document-wide selector reaches the link from any element. Each script must call selector APIs
-(`querySelector(All)`, `closest`, `matches`, `getElementById`) only with literal arguments, and every
-such argument must be understood and ruled out. A script that uses child or sibling traversal,
-`children`/`childNodes`, `document.links`, `getElementsBy*`, XPath or ranges, observer node lists,
-`event.target`/`document.activeElement` other than in `.closest(...)` or an `===`/`!==` comparison,
-an aliased or bound selector API, jQuery-style `$()`, computed string properties, string evaluation,
-or a rewrite of `body`/`documentElement` markup keeps the link protected, as does executable markup
-in any HTML embed of the tree. Scripts of another document rendered together with this tree (a
-Page's own scripts inside its Template, or the Template's scripts around a Page) are not inspected.
+Every script that can run in the same browser document is classified, not only scripts on the
+link's ancestor path: the whole element tree, and for a Template link every Page that uses the
+Template (for a Page link, its effective Template), including each document's stored draft and
+published outputs in every locale, because a published output can still carry a script removed
+from the tree since. The server loads this inventory fresh for every inspection and again for the
+final compare-and-set; if any Page, tree or output cannot be loaded, the link stays protected.
+
+Each script must call selector APIs (`querySelector(All)`, `closest`, `matches`, `getElementById`)
+only with literal arguments, and every such argument must be understood and ruled out. A script
+keeps the link protected when it uses child or sibling traversal, `children`/`childNodes`,
+`document.links`, `getElementsBy*`, XPath or ranges, observer node lists, `event.target` or
+`document.activeElement` other than in `.closest(...)` or an `===`/`!==` comparison, an aliased or
+bound selector API, jQuery-style `$()`, computed string properties, or string evaluation. It also
+keeps the link protected when it replaces or removes content in any way, because the replaced node
+could be an ancestor of the link: `innerHTML`, `outerHTML`, `textContent` or `innerText`
+assignments, `insertAdjacentHTML`, `replaceChildren`, `replaceWith`, `remove()`, `removeChild`,
+`DOMParser`, creating `script` elements, `javascript:` URLs, or setting `on*` attributes. Inline event
+handlers are classified as code with the same rules. External, module and unterminated scripts,
+frames, `srcdoc`, `formaction`, `<base>` and `javascript:` URLs anywhere in the inventory keep the
+link protected. Scripts that Runtime itself injects (cart, checkout, resource and variant
+providers) and edge-injected scripts are not part of the stored documents and are not inspected.
 
 To keep a script's link logic unchanged while excluding one link, keep its selector and add a
 `:not(.<class>)` for a class carried only by that link, then add the class to the link. Narrowing a
