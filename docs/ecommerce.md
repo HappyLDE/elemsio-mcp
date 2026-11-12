@@ -73,8 +73,9 @@ them from the owner or another authoritative source, and do not estimate distanc
 Runtime then charges `shipping_cost + rate_per_km x one-way route kilometres` (road distance from the
 configured routing provider), rounded to the minor unit, and the free-shipping threshold still
 applies. A routing failure blocks the quote instead of falling back to a flat price. Passing
-`distance_pricing: null` clears only the per-km rate (distance matching and the origin stay), so a
-zone can return to its flat `shipping_cost`. `free_shipping_from: 0` is rejected; use `null` to remove
+`distance_pricing: null` clears the per-km rate. When the zone has no minimum/maximum distance range
+it also turns distance matching off, so the zone returns to its flat `shipping_cost` without
+geocoding or routing; a zone with a range keeps distance matching. The stored origin stays. `free_shipping_from: 0` is rejected; use `null` to remove
 the threshold. Omitted fields keep their stored values; postal-code and distance-range matching are
 never changed by this tool.
 
