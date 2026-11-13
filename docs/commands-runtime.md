@@ -51,6 +51,23 @@ The command resolves only the current `elementFunctionShippingAddressItem.id`, a
 and requires the active provider and loop scope. It accepts only `prop:data-*`; arbitrary Liquid and
 other attribute targets are rejected.
 
+## Customer order history
+
+Inside a page-owned `clientOrders` provider, `clientOrdersHasNextPage` / `clientOrdersHasPreviousPage`
+guard pagination links whose `href` is bound with `clientOrdersNextPageUrl` / `clientOrdersPreviousPageUrl`
+(`prop:href`). The Runtime builds these relative URLs from the current page and the provider's
+`pageParam`. Inside a `clientOrderDetail` provider, `clientOrderDetailFound` shows the signed-in
+customer's requested order; `clientOrderDetailNotFound` is true only when an order identifier was
+requested and no order of that customer matched, so another customer's order is indistinguishable from a
+missing one. It is also true for a signed-out request that carries an identifier, so place it inside an
+`if:loggedIn` branch. `clientOrderDetailMissing` remains true whenever no order is shown.
+
+```text
+0 div "Orders" fn="clientOrders"
+  1 a "Newer orders" cmd.if:clientOrdersHasPreviousPage="" cmd.clientOrdersPreviousPageUrl="prop:href"
+  1 a "Older orders" cmd.if:clientOrdersHasNextPage="" cmd.clientOrdersNextPageUrl="prop:href"
+```
+
 ## Current command allowlist
 
 The following names are the external behavior validator's complete current allowlist. A name being
@@ -95,10 +112,12 @@ shippingAddressItemPhoneNumber shippingAddressItemStreet shippingAddressItemStre
 shippingAddressItemCity shippingAddressItemState shippingAddressItemCountry shippingAddressItemZipcode
 shippingAddressItemId shippingAddressItemIsDefault shippingAddressItemIsInCart clientOrders clientOrdersHasItems
 clientOrdersEmpty clientOrdersHasMultiplePages clientOrdersHasNextPage clientOrdersHasPreviousPage
-clientOrdersTotal clientOrdersCurrentPage clientOrdersLastPage clientOrderIdentifier clientOrderNumber
+clientOrdersTotal clientOrdersCurrentPage clientOrdersLastPage clientOrdersNextPageUrl
+clientOrdersPreviousPageUrl clientOrderIdentifier clientOrderNumber
 clientOrderDate clientOrderCreatedAt clientOrderStatus clientOrderStatusFormatted
 clientOrderPaymentStatus clientOrderPaymentStatusFormatted clientOrderTotalFormatted
 clientOrderCurrency clientOrderItemsCount clientOrderDetailFound clientOrderDetailMissing
+clientOrderDetailNotFound
 clientOrderDetailHasItems clientOrderDetailHasDiscounts clientOrderDetailIdentifier
 clientOrderDetailNumber clientOrderDetailDate clientOrderDetailCreatedAt clientOrderDetailStatus
 clientOrderDetailStatusFormatted clientOrderDetailPaymentStatus
