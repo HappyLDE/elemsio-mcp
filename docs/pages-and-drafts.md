@@ -18,7 +18,8 @@ uses the current website-owned effective/default template. It initializes every 
 generates drafts, but never publishes.
 
 Duplicate normalized slugs conflict. The tool cannot create or replace a homepage, create a template,
-or archive/delete a page. Use `elems_list_pages`, `elems_get_page`, and the returned
+or archive/delete a page. Slugs cannot contain dots: crawler files such as `app-ads.txt` are Website
+text files (see `elems://docs/media`), never Pages. Use `elems_list_pages`, `elems_get_page`, and the returned
 effective-template and publication metadata rather than guessing state.
 
 ## Page identity updates
