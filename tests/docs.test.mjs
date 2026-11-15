@@ -233,7 +233,9 @@ test('Website well-known text files are routed as exact text files, never Pages'
     'elems_update_website_text_file_draft',
     'elems_publish_website_text_file',
     'elems_unpublish_website_text_file',
+    'elems_delete_website_text_file',
   ]) assert.match(media, new RegExp(tool))
+  assert.match(media, /stale hash returns CONFLICT even when\s+the current draft is already published/)
   assert.match(media, /`app-ads\.txt`, `ads\.txt` and\s+`\.well-known\/security\.txt`/)
   assert.match(media, /`robots\.txt` is not supported/)
   assert.match(media, /byte-for-byte/)

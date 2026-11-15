@@ -116,14 +116,20 @@ HTML document. Supported paths are a closed set: `app-ads.txt`, `ads.txt` and
 3. Read back, compare the draft `sha256` and body with the intended bytes, then call
    `elems_publish_website_text_file` with the fresh hash. This is a separate, deliberate publication.
 4. `elems_unpublish_website_text_file` stops serving the file and keeps the draft.
+5. `elems_delete_website_text_file` discards the draft of an unpublished file and returns it to
+   `unconfigured`. A published file is rejected with CONFLICT until it is unpublished, so deleting
+   never changes the public response.
 
 Bodies are stored and served byte-for-byte: no trimming, re-encoding, line-ending normalization or
 added trailing newline. A body is 1 to 131072 UTF-8 bytes; BOM, NUL, other control characters except
 tab, LF and CRLF, and invisible bidi or line-separator characters are rejected. Content syntax is not
 interpreted: use the exact record issued by the ad or security platform and never invent one.
-Identical retries return `already_current`; other stale writes return CONFLICT.
+An identical draft, an already unpublished file and a file without a draft (for delete) return
+`already_current`. Publication always needs the fresh hash: a stale hash returns CONFLICT even when
+the current draft is already published, because it may describe a draft that was never published.
+Other stale writes return CONFLICT. After a CONFLICT, read again before deciding to retry.
 
-Published files are served on every live Website domain at `/<path>` with HTTP 200,
+Published files are served on every activated Website domain at `/<path>` with HTTP 200,
 `Content-Type: text/plain; charset=utf-8` and `Cache-Control: public, max-age=300`, with no cookies
 or markup. Unpublished files return a plain-text 404; a storage or integrity failure returns 503.
 Edge caches may keep the previous response for up to five minutes. Verify the public URL after
