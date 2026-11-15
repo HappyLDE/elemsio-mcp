@@ -118,7 +118,10 @@ Path policy. A path is exactly `<stem>.txt` or `.well-known/<stem>.txt`, with no
   `assetlinks.json`) are not text files and are not supported.
 - `app-ads.txt`, `ads.txt` and `.well-known/security.txt` are always listed. A Website can hold
   32 files with content; creating another returns CONFLICT (`text_file_limit_reached`) until an
-  unused draft is deleted.
+  unused file is unpublished and deleted. Deleted paths stay reusable, but a Website can use at
+  most 128 distinct paths in total (`text_file_row_limit_reached`).
+- Nested directories (for example `.well-known/pki-validation/...`) and upper-case names are not
+  supported; ask the platform for a lowercase root or `.well-known/` `.txt` file instead.
 
 1. `elems_get_website_text_files` lists the standard paths and every stored file with `state`
    (`unconfigured`, `draft_only`, `published`, `published_with_unpublished_draft`), `revision`,
