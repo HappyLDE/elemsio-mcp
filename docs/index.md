@@ -37,8 +37,9 @@ Website favicon/site-icon identity: read `elems_get_context.favicon`, then use
 `elems_set_website_favicon` for existing Media set/replace or null clear. Load
 `elems://docs/media` for eligibility, CAS and immediate Website semantics.
 
-Website well-known text files (`app-ads.txt`, `ads.txt`, `.well-known/security.txt`): use
-`elems_get_website_text_files`, `elems_update_website_text_file_draft`, then the separate
-`elems_publish_website_text_file`. Never create a Page for them. Load `elems://docs/media`
+Website text files (`<name>.txt` at the root or under `.well-known/`, such as `app-ads.txt`,
+`ads.txt`, `llms.txt` or `.well-known/security.txt`): use `elems_get_website_text_files`,
+`elems_update_website_text_file_draft`, then the separate `elems_publish_website_text_file`. Never
+create a Page for them. Load `elems://docs/media`
 for exact-byte, CAS and publication semantics.
 

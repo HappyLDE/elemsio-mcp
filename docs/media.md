@@ -100,17 +100,30 @@ removes Website/Media state through the existing lifecycle, including public obj
 Standards references: [HTML icon relation](https://html.spec.whatwg.org/multipage/links.html#rel-icon),
 [browser image formats](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types).
 
-## Website well-known text files
+## Website text files
 
-Crawler files that must be served as exact plain text at the host root, such as Google AdMob
-`app-ads.txt`, are Website text files, not Pages or Media. They have no slug, locale, template,
-elements, Liquid, SEO or menu entry, and a Page can never stand in for them: a Page is always an
-HTML document. Supported paths are a closed set: `app-ads.txt`, `ads.txt` and
-`.well-known/security.txt`. `robots.txt` is not supported.
+Files that must be served as exact plain text at the host root, such as Google AdMob `app-ads.txt`,
+`ads.txt`, `llms.txt`, `.well-known/security.txt` or a domain verification token, are Website text
+files, not Pages or Media. They have no slug, locale, template, elements, Liquid, SEO or menu entry,
+and a Page can never stand in for them: a Page is always an HTML document.
 
-1. `elems_get_website_text_files` lists each path with `state` (`unconfigured`, `draft_only`,
-   `published`, `published_with_unpublished_draft`), `revision`, `text_file_hash` and draft/published
-   `byte_length` and `sha256`. Pass `path` to include that file's bodies.
+Path policy. A path is exactly `<stem>.txt` or `.well-known/<stem>.txt`, with no leading slash:
+
+- `<stem>` is lowercase ASCII `[a-z0-9]([a-z0-9_-]{0,46}[a-z0-9])?`: 1 to 48 letters, digits, `-` or
+  `_`, starting and ending with a letter or digit. Paths are at most 64 characters.
+- Only `.txt` is allowed. Upper case, other or double extensions, nested directories, `..`,
+  percent-encoding and non-ASCII characters are rejected, never rewritten: send the exact lowercase
+  path the platform asks for.
+- `robots.txt` is reserved and not supported. JSON files under `.well-known/` (for example
+  `assetlinks.json`) are not text files and are not supported.
+- `app-ads.txt`, `ads.txt` and `.well-known/security.txt` are always listed. A Website can hold
+  32 files with content; creating another returns CONFLICT (`text_file_limit_reached`) until an
+  unused draft is deleted.
+
+1. `elems_get_website_text_files` lists the standard paths and every stored file with `state`
+   (`unconfigured`, `draft_only`, `published`, `published_with_unpublished_draft`), `revision`,
+   `text_file_hash` and draft/published `byte_length` and `sha256`. Pass `path` to include that
+   file's bodies, and to get the fresh hash of a new file before creating it.
 2. `elems_update_website_text_file_draft` stores the exact body as the draft, using the fresh
    `text_file_hash`. The public response is unchanged.
 3. Read back, compare the draft `sha256` and body with the intended bytes, then call
@@ -129,7 +142,8 @@ An identical draft, an already unpublished file and a file without a draft (for 
 the current draft is already published, because it may describe a draft that was never published.
 Other stale writes return CONFLICT. After a CONFLICT, read again before deciding to retry.
 
-Published files are served on every activated Website domain at `/<path>` with HTTP 200,
+Published files are served on every activated Website domain at `/<path>` (for example
+`https://example.com/llms.txt`) with HTTP 200,
 `Content-Type: text/plain; charset=utf-8` and `Cache-Control: public, max-age=300`, with no cookies
 or markup. Unpublished files return a plain-text 404; a storage or integrity failure returns 503.
 Edge caches may keep the previous response for up to five minutes. Verify the public URL after
