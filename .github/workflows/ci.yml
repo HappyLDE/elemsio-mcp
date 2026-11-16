@@ -8,7 +8,9 @@ concurrency:
   cancel-in-progress: true
 jobs:
   documentation-contract:
-    runs-on: [self-hosted, linux, x64, elems-ci, elems-lenovo-vm]
+    # Canonical compute is the Lenovo VM. The owner-only repository variable ELEMS_CI_HOST=deck
+    # selects the qualified Steam Deck VM instead; any other value or no value keeps the Lenovo.
+    runs-on: [self-hosted, linux, x64, elems-ci, "${{ vars.ELEMS_CI_HOST == 'deck' && 'elems-deck-vm' || 'elems-lenovo-vm' }}"]
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
