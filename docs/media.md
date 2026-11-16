@@ -99,3 +99,56 @@ removes Website/Media state through the existing lifecycle, including public obj
 
 Standards references: [HTML icon relation](https://html.spec.whatwg.org/multipage/links.html#rel-icon),
 [browser image formats](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types).
+
+## Website text files
+
+Files that must be served as exact plain text at the host root, such as Google AdMob `app-ads.txt`,
+`ads.txt`, `llms.txt`, `.well-known/security.txt` or a domain verification token, are Website text
+files, not Pages or Media. They have no slug, locale, template, elements, Liquid, SEO or menu entry,
+and a Page can never stand in for them: a Page is always an HTML document.
+
+Path policy. A path is exactly `<stem>.txt` or `.well-known/<stem>.txt`, with no leading slash:
+
+- `<stem>` is lowercase ASCII `[a-z0-9]([a-z0-9_-]{0,46}[a-z0-9])?`: 1 to 48 letters, digits, `-` or
+  `_`, starting and ending with a letter or digit. Paths are at most 64 characters.
+- Only `.txt` is allowed. Upper case, other or double extensions, nested directories, `..`,
+  percent-encoding and non-ASCII characters are rejected, never rewritten: send the exact lowercase
+  path the platform asks for.
+- `robots.txt` is reserved and not supported. JSON files under `.well-known/` (for example
+  `assetlinks.json`) are not text files and are not supported.
+- `app-ads.txt`, `ads.txt` and `.well-known/security.txt` are always listed. A Website can hold
+  32 files with content; creating another returns CONFLICT (`text_file_limit_reached`) until an
+  unused file is unpublished and deleted. Deleted paths stay reusable, but a Website can use at
+  most 128 distinct paths in total (`text_file_row_limit_reached`).
+- Nested directories (for example `.well-known/pki-validation/...`) and upper-case names are not
+  supported; ask the platform for a lowercase root or `.well-known/` `.txt` file instead.
+
+1. `elems_get_website_text_files` lists the standard paths and every stored file with `state`
+   (`unconfigured`, `draft_only`, `published`, `published_with_unpublished_draft`), `revision`,
+   `text_file_hash` and draft/published `byte_length` and `sha256`. Pass `path` to include that
+   file's bodies, and to get the fresh hash of a new file before creating it.
+2. `elems_update_website_text_file_draft` stores the exact body as the draft, using the fresh
+   `text_file_hash`. The public response is unchanged.
+3. Read back, compare the draft `sha256` and body with the intended bytes, then call
+   `elems_publish_website_text_file` with the fresh hash. This is a separate, deliberate publication.
+4. `elems_unpublish_website_text_file` stops serving the file and keeps the draft.
+5. `elems_delete_website_text_file` discards the draft of an unpublished file and returns it to
+   `unconfigured`. A published file is rejected with CONFLICT until it is unpublished, so deleting
+   never changes the public response.
+
+Bodies are stored and served byte-for-byte: no trimming, re-encoding, line-ending normalization or
+added trailing newline. A body is 1 to 131072 UTF-8 bytes; BOM, NUL, other control characters except
+tab, LF and CRLF, and invisible bidi or line-separator characters are rejected. Content syntax is not
+interpreted: use the exact record issued by the ad or security platform and never invent one.
+An identical draft, an already unpublished file and a file without a draft (for delete) return
+`already_current`. Publication always needs the fresh hash: a stale hash returns CONFLICT even when
+the current draft is already published, because it may describe a draft that was never published.
+Other stale writes return CONFLICT. After a CONFLICT, read again before deciding to retry.
+
+Published files are served on every activated Website domain at `/<path>` (for example
+`https://example.com/llms.txt`) with HTTP 200,
+`Content-Type: text/plain; charset=utf-8` and `Cache-Control: public, max-age=300`, with no cookies
+or markup. Unpublished files return a plain-text 404; a storage or integrity failure returns 503.
+Edge caches may keep the previous response for up to five minutes. Verify the public URL after
+publication.
+
