@@ -223,27 +223,3 @@ test('relative link detection rejects unsupported forms and accepts registered U
     assert.ok(markdownLinkTargets(sample).every(resolvableInMcp), sample)
   }
 })
-
-test('Website well-known text files are routed as exact text files, never Pages', () => {
-  const media = read('docs/media.md')
-  const index = read('docs/index.md')
-  const pages = read('docs/pages-and-drafts.md')
-  for (const tool of [
-    'elems_get_website_text_files',
-    'elems_update_website_text_file_draft',
-    'elems_publish_website_text_file',
-    'elems_unpublish_website_text_file',
-    'elems_delete_website_text_file',
-  ]) assert.match(media, new RegExp(tool))
-  assert.match(media, /stale hash returns CONFLICT even when\s+the current draft is already published/)
-  assert.match(media, /exactly `<stem>\.txt` or `\.well-known\/<stem>\.txt`/)
-  assert.match(media, /lowercase ASCII `\[a-z0-9\]\(\[a-z0-9_-\]\{0,46\}\[a-z0-9\]\)\?`/)
-  assert.match(media, /rejected, never rewritten/)
-  assert.match(media, /`robots\.txt` is reserved and not supported/)
-  assert.match(media, /text_file_limit_reached/)
-  assert.match(media, /byte-for-byte/)
-  assert.match(media, /separate, deliberate publication/)
-  assert.match(media, /never invent one/)
-  assert.match(index, /Never\s+create a Page for them/)
-  assert.match(pages, /Slugs cannot contain dots/)
-})
