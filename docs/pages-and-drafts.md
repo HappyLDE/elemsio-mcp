@@ -36,6 +36,43 @@ Menu Page destinations are updated to the new canonical slug in the same transac
 native Page destinations. Read the canonical identity from the update result or `elems_list_pages`.
 This operation does not create, publish, or archive Pages.
 
+## Plain-text Pages
+
+A plain-text Page serves its exact body as `text/plain; charset=utf-8`, with no template, HTML,
+Liquid, SEO head, or branding. Use it for crawler files such as `app-ads.txt` or `ads.txt`. Every
+other Page stays HTML; a `.txt` slug alone does not change how a Page is served.
+
+```text
+elems_create_page (slug app-ads.txt) -> elems_get_page (page.content_revision)
+-> elems_update_page plain_text + expected_content_revision -> elems_get_page (draft_sha256)
+-> elems_publish_page per locale -> verify the public URL
+```
+
+- **Opt in explicitly.** Call `elems_update_page` with `plain_text` and the fresh
+  `expected_content_revision`, which is `page.content_revision` from `elems_get_page`. Send nothing
+  else. The first call converts an unpublished ordinary Page: `page.content_format` becomes
+  `plaintext` and stays so. Published, home, system, redirect, product-layout, and legacy Pages
+  are refused.
+- **The body is exact.** It is stored verbatim in every locale draft. It is never trimmed,
+  normalized, localized, or compiled. It must be non-blank and at most 65536 UTF-8 bytes. It must not
+  contain a byte-order mark, control characters other than tab, LF, and CRLF, a bare CR, invisible
+  bidirectional controls, or Unicode line separators.
+- **Retries and conflicts.** An exact retry returns `already_applied`. Any other concurrent change
+  returns `CONFLICT`; read `elems_get_page` again.
+- **Verify by hash.** `page.plain_text.locales.<locale>.draft_sha256` and `published_sha256` are
+  SHA-256 hashes of the exact UTF-8 bytes. They equal `sha256sum` of the served body.
+- **Publish deliberately.** Use `elems_publish_page` with the usual publication preconditions for
+  each locale that should serve the body. It copies the draft verbatim. Visitors who request a locale
+  without a published translation get the website default locale's published body.
+- **Other writes are refused.** Element, markup, HTML embed, class, behavior, SEO, template,
+  draft-regeneration, preview-generation, and legacy editor writes return `PLAINTEXT_PAGE_LOCKED`.
+  Change the body only through `elems_update_page` `plain_text`.
+- **SEO.** The Page SEO definition of done does not apply to plain-text Pages, because they have no
+  HTML head.
+- **Serving.** Only the exact path (`/<slug>` or `/<locale>/<slug>`) is served, and only for GET and
+  HEAD. Suffix paths, trailing slashes, and case variants get a plain-text 404. The draft preview URL
+  serves the draft as private, `no-store`, `noindex` text.
+
 ## Canonical edit lifecycle
 
 ```text
